@@ -36,6 +36,7 @@ class PoissonCalibrationMaster(CalibrationMaster):
 			if debug == 1:
 				print "Date: %s \tParameters: %s" %(date, intensity)
 			results.append((date, intensity) ) 
+			self.PoissonCalibration.Guess = intensity
 			
 		if debug == 1:
 			self.PoissonCalibration.CalibrationResults()
@@ -101,7 +102,7 @@ if __name__ == '__main__':
 								
 	for Calib in [HP, CIR, IHP, GOU, IGOU]:
 		x = PoissonCalibrationMaster( 
-							CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
+							CreditDerivativeCSVReader(file = "../Data/iTraxxAU.csv"),
 							Calib,
 							)
 		results =  x.Calibrate(debug = 0, N = 3)
