@@ -19,11 +19,11 @@ class PoissonCalibrationMaster(CalibrationMaster):
 		self.CSVData = CreditDerivativesCSVReader
 		self.PoissonCalibration = PoissonCalibration
 
-	def Calibrate(self, debug = 1, N = "Null"):
+	def Calibrate(self, debug = 1, N = False, dynamic = True):
 		"""docstring for Calibrate"""
 		dates = self.CSVData.Dates()
 		
-		if N != "Null":
+		if N != False:
 			# Get the last N dates
 			dates = dates[-N:]
 		
@@ -37,7 +37,8 @@ class PoissonCalibrationMaster(CalibrationMaster):
 			if debug == 1:
 				print "Date: %s \tParameters: %s" %(date, intensity)
 			results.append((date, intensity, RMSE) ) 
-			self.PoissonCalibration.Guess = intensity
+			if dynamic == True:
+				self.PoissonCalibration.Guess = intensity
 			
 		if debug == 1:
 			self.PoissonCalibration.CalibrationResults()
@@ -102,11 +103,13 @@ if __name__ == '__main__':
 								Guess			= [0.3, 0.8, 5, 0.02],
 								)
 								
-	for Calib in [HP, CIR, IHP, GOU, IGOU]:
+	for Calib in [HP, IHP, CIR, GOU, IGOU]:
 		x = PoissonCalibrationMaster( 
 							CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
 							Calib,
 							)
+		print Calib.Process
 		results =  x.Calibrate(debug = 0, N = 2)
 		print x.FormatResults(results)
+		print 
 		

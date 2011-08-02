@@ -510,6 +510,9 @@ def LevyProcessPlots():
 	print "Process Simulations Completed"
 	# pylab.show()
 
+def ParameterStability():
+	"""docstring for ParameterStability"""
+	pass
 
 	
 if __name__ == '__main__':
