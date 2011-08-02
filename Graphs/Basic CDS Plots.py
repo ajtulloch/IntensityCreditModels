@@ -47,6 +47,7 @@ params = {'backend': 'pdf',
 		  # 'font.serif' : ['Minion Pro']
 			}
 
+pylab.rcParams.update(params)
 
 def CDSCashflows( barcolour = "grey"):
 	"""Creates the chart"""
@@ -545,18 +546,16 @@ def ParameterStabilityRMSE():
 		upper = np.concatenate((dynamic_rmse,static_rmse)).max()	
 		bounds = (lower, upper)
 		
-		
 		pylab.figure(1)
-		
 		pylab.clf()
+		
 		pylab.subplot(1,2,1)
 
 		if AUTOCOLOR:
 			homon = pylab.hist(dynamic_rmse, range = bounds, color = AUTOCOLOR_COLORS[0])
 		else:
 			homon = pylab.hist(dynamic_rmse, range = bounds, color = "black")
-
-		pylab.title('Dynamic')
+		# pylab.title('Dynamic')
 		pylab.xlabel('RMSE')
 		pylab.ylabel('Frequency')
 
@@ -566,15 +565,14 @@ def ParameterStabilityRMSE():
 			homon = pylab.hist(static_rmse, range = bounds, color = AUTOCOLOR_COLORS[1])
 		else:
 			homon = pylab.hist(static_rmse, range = bounds, color = "grey")
-		pylab.rc('text', usetex=True)
 		
-		pylab.title('Static')
+		# pylab.title('Static')
 		pylab.xlabel('RMSE')
 		pylab.ylabel('Frequency')
 
 		# pylab.subplots_adjust(bottom=0.15)
 		pylab.subplots_adjust(wspace=0.4)
-		pylab.suptitle(pretty_mapping[process] + " RMSE")
+		# pylab.suptitle(pretty_mapping[process] + " RMSE")
 		
 		pdf_file = "../../Diagrams/ParameterStability/" + process + ".pdf"
 		pylab.savefig(pdf_file)
@@ -584,14 +582,13 @@ def ParameterStabilityRMSE():
 	
 	for process in ['IHP', 'CIR', 'GOU', 'IGOU', 'HP']:
 		PlotRMSEs(process)
-	
+		
 	print "Parameter Stability RMSE Completed"
 
 def ParameterStabilityParameters():
 	"""docstring for ParameterStability"""
 	
 	pylab.rcParams.update(params)
-	
 	def GetParameters(process, dynamic):
 		"""docstring for GetRMSE"""
 		if dynamic == True:
@@ -691,7 +688,7 @@ if __name__ == '__main__':
 	# CDSTermStructure()
 	# IntensityStructure()
 	# ParSpreadAndSurvivalProbabilities()
-	TimeSeriesPlot()
+	# TimeSeriesPlot()
 	# LevyProcessPlots()
-	# ParameterStabilityRMSE()
-	ParameterStabilityParameters()
+	ParameterStabilityRMSE()
+	# ParameterStabilityParameters()

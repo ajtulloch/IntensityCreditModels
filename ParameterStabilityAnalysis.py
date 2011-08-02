@@ -35,35 +35,60 @@ def main():
 								)
 
 	for Calib in [HP, IHP, CIR, GOU, IGOU]:
+
+		x = PoissonCalibrationMaster( 	CreditDerivativeCSVReader(file = "../Data/iTraxxAU.csv"),
+										Calib,
+										)
+		print Calib.Process
+		results =  x.Calibrate(debug = 0, N = 210, dynamic = False)
+		output =  x.FormatResults(results)
+		# print output 
+		zipped = zip(*output)
+
+		filename = "Calibration Results/AU/Static/" + Calib.Process + ".csv"
+		with open(filename, 'wb') as f:
+		    writer = csv.writer(f)
+		    writer.writerows(zipped)
+
+		results =  x.Calibrate(debug = 0, N = 210, dynamic = True)
+		output =  x.FormatResults(results)
+		# print output 
+		zipped = zip(*output)
+
+		filename = "Calibration Results/AU/Dynamic/" + Calib.Process + ".csv"
+		with open(filename, 'wb') as f:
+		    writer = csv.writer(f)
+		    writer.writerows(zipped)
+		
+		# CDX Data
+	for Calib in [HP, IHP, CIR, GOU, IGOU]:
+
 		x = PoissonCalibrationMaster( 	CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
 										Calib,
 										)
 		print Calib.Process
-		results =  x.Calibrate(debug = 0, N = 100, dynamic = False)
+		results =  x.Calibrate(debug = 0, N = 1255, dynamic = False)
 		output =  x.FormatResults(results)
-		print output 
+		# print output 
 		zipped = zip(*output)
 
-		filename = "Calibration Results/Static/" + Calib.Process + ".csv"
+		filename = "Calibration Results/CDX/Static/" + Calib.Process + ".csv"
 		with open(filename, 'wb') as f:
 		    writer = csv.writer(f)
 		    writer.writerows(zipped)
 
-			results =  x.Calibrate(debug = 0, N = 100, dynamic = False)
-			output =  x.FormatResults(results)
-			print output 
-			zipped = zip(*output)
+		results =  x.Calibrate(debug = 0, N = 1255, dynamic = True)
+		output =  x.FormatResults(results)
+		# print output 
+		zipped = zip(*output)
 
-		filename = "Calibration Results/Static/" + Calib.Process + ".csv"
+		filename = "Calibration Results/CDX/Dynamic/" + Calib.Process + ".csv"
 		with open(filename, 'wb') as f:
 		    writer = csv.writer(f)
 		    writer.writerows(zipped)
 
-			results =  x.Calibrate(debug = 0, N = 100, dynamic = False)
-			output =  x.FormatResults(results)
-			print output 
-			zipped = zip(*output)
-	
+
+
 	
 if __name__ == '__main__':
 	main()
