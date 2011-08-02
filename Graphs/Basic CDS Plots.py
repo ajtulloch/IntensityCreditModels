@@ -511,7 +511,7 @@ def LevyProcessPlots():
 	print "Process Simulations Completed"
 	# pylab.show()
 
-def ParameterStability():
+def ParameterStabilityRMSE():
 	"""docstring for ParameterStability"""
 	def GetRMSE(process, dynamic):
 		"""docstring for GetRMSE"""
@@ -585,9 +585,6 @@ def ParameterStability():
 	
 	print "Parameter Stability Completed"
 		
-def Print (self):
-	"""docstring for Print """
-	pass		
 	
 if __name__ == '__main__':
 	# CDSIssuance()
@@ -597,4 +594,4 @@ if __name__ == '__main__':
 	# ParSpreadAndSurvivalProbabilities()
 	# TimeSeriesPlot()
 	# LevyProcessPlots()
-	ParameterStability()
+	ParameterStabilityRMSE()
