@@ -105,6 +105,6 @@ if __name__ == '__main__':
 							CreditDerivativeCSVReader(file = "../Data/iTraxxAU.csv"),
 							Calib,
 							)
-		results =  x.Calibrate(debug = 0, N = 3)
+		results =  x.Calibrate(debug = 0, N = 10)
 		print x.FormatResults(results)
 		

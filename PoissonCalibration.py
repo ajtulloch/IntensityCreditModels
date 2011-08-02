@@ -41,6 +41,21 @@ class PoissonCalibration(object):
 							)
 		self.calibrated_gamma = output
 		return output
+	
+	def RMSE(self):
+		"""docstring for RM"""
+		N = len(self.MarketData.Tenors())
+		sum = 0
+		for t, market_spread in sorted(self.MarketData.Data()):
+			CDS = self.CDS(	DiscountCurve = self.DiscountCurve, 
+							maturity = t
+							)
+			model_spread = CDS.ParSpread(self.calibrated_gamma)		
+			if type(model_spread).__name__ == 'ndarray':
+				model_spread = model_spread[0]
+			sum += (model_spread - market_spread) ** 2
+		RMSE = sqrt(sum/N)
+		return RMSE	
 
 	def CalibrationResults(self):
 		"""docstring for CalibrationError"""	
@@ -135,7 +150,22 @@ class InhomogenousPoissonCalibration(PoissonCalibration):
 							)
 		self.calibrated_gamma = output
 		return output
+	
+	def RMSE(self):
+		N = len(self.MarketData.Tenors())
+		sum = 0
+		for t, market_spread in sorted(self.MarketData.Data()):
+			CDS = IHPCreditDefaultSwap(	tenors = sorted(self.MarketData.Tenors()), 
+										DiscountCurve = self.DiscountCurve, 
+										maturity = t
+										)
+			model_spread = CDS.ParSpread(self.calibrated_gamma)	
+			sum += (model_spread - market_spread) ** 2
 		
+		RMSE = sqrt(sum/N)
+		return RMSE
+	
+	
 	def CalibrationResults(self):
 		"""docstring for CalibrationError"""
 		print "-" * 80
@@ -159,7 +189,7 @@ class InhomogenousPoissonCalibration(PoissonCalibration):
 		
 		RMSE = sqrt(sum/N)
 		print "RMSE: ", RMSE
-		return None
+		return RMSE
 
 #------------------------------------------------------------------------------
 
