@@ -33,9 +33,10 @@ class PoissonCalibrationMaster(CalibrationMaster):
 			Data = MarketData(self.CSVData.TimeSlice(date))
 			self.PoissonCalibration.MarketData = Data
 			intensity = self.PoissonCalibration.Calibrate()
+			RMSE = self.PoissonCalibration.RMSE()
 			if debug == 1:
 				print "Date: %s \tParameters: %s" %(date, intensity)
-			results.append((date, intensity) ) 
+			results.append((date, intensity, RMSE) ) 
 			self.PoissonCalibration.Guess = intensity
 			
 		if debug == 1:
@@ -53,7 +54,8 @@ class PoissonCalibrationMaster(CalibrationMaster):
 		for parameter in range(parameter_length):
 			parameter_values = [row[1][parameter] for row in results] 
 			output.append(parameter_values)
-
+		RMSEs = [row[2] for row in results]
+		output.append(RMSEs)
 		return output
 
 #------------------------------------------------------------------------------
@@ -102,9 +104,9 @@ if __name__ == '__main__':
 								
 	for Calib in [HP, CIR, IHP, GOU, IGOU]:
 		x = PoissonCalibrationMaster( 
-							CreditDerivativeCSVReader(file = "../Data/iTraxxAU.csv"),
+							CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
 							Calib,
 							)
-		results =  x.Calibrate(debug = 0, N = 10)
+		results =  x.Calibrate(debug = 0, N = 2)
 		print x.FormatResults(results)
 		
