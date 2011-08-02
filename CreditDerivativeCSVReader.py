@@ -58,5 +58,5 @@ class CreditDerivativeCSVReader(object):
 		
 if __name__ == '__main__':
 	Y = CreditDerivativeCSVReader( "../Data/CDX.csv" )
-	# print Y.TimeSeries("5")
-	print Y.PlotSeries("3")
+	print Y.TimeSeries("5")
+	# print Y.PlotSeries("3")

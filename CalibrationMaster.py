@@ -19,22 +19,41 @@ class PoissonCalibrationMaster(CalibrationMaster):
 		self.CSVData = CreditDerivativesCSVReader
 		self.PoissonCalibration = PoissonCalibration
 
-	def Calibrate(self):
+	def Calibrate(self, debug = 1, N = "Null"):
 		"""docstring for Calibrate"""
 		dates = self.CSVData.Dates()
+		
+		if N != "Null":
+			# Get the last N dates
+			dates = dates[-N:]
+		
+		
 		results = []
 		for date in dates:
 			Data = MarketData(self.CSVData.TimeSlice(date))
 			self.PoissonCalibration.MarketData = Data
 			intensity = self.PoissonCalibration.Calibrate()
-			print "Date: %s \tParameters: %s" %(date, intensity)
+			if debug == 1:
+				print "Date: %s \tParameters: %s" %(date, intensity)
 			results.append((date, intensity) ) 
 			
-		self.PoissonCalibration.CalibrationResults()
+		if debug == 1:
+			self.PoissonCalibration.CalibrationResults()
 		self.results = results
 		return results
-		
+	
+	def FormatResults(self, results):
+		"""docstring for FormatResults"""
+		parameter_length = len(results[0][1]) 
+		# Number of parameters in output
+		output = []
+		dates = [row[0] for row in results]
+		output.append(dates)
+		for parameter in range(parameter_length):
+			parameter_values = [row[1][parameter] for row in results] 
+			output.append(parameter_values)
 
+		return output
 
 #------------------------------------------------------------------------------
 
@@ -82,7 +101,9 @@ if __name__ == '__main__':
 								
 	for Calib in [HP, CIR, IHP, GOU, IGOU]:
 		x = PoissonCalibrationMaster( 
-							CreditDerivativeCSVReader(file = "../Data/iTraxxAU.csv"),
+							CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
 							Calib,
 							)
-		x.Calibrate()
+		results =  x.Calibrate(debug = 0, N = 3)
+		print x.FormatResults(results)
+		
