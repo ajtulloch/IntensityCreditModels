@@ -18,6 +18,7 @@ from pylab import exp as vec_exp
 from MarketData import *
 from pylab import exp as vec_exp
 from PoissonCalibration import *
+import csv
 
 AUTOCOLOR = 1
 AUTOCOLOR_COLORS = ("#348ABD", "#7A68A6", "#A60628", "#467821", "#CF4457", "#188487", "#E24A33")
@@ -35,7 +36,7 @@ params = {'backend': 'pdf',
           'legend.fontsize': 8,
           'xtick.labelsize': 8,
           'ytick.labelsize': 8,
-          'text.usetex': True,
+          'text.usetex'		: True,
           'figure.figsize': fig_size,
 		  # 'axes.color_cycle'    : ("#348ABD", "#7A68A6", "A60628", "467821", "CF4457", "188487", "E24A33"),
 		  'figure.subplot.bottom': 0.12,
@@ -512,15 +513,88 @@ def LevyProcessPlots():
 
 def ParameterStability():
 	"""docstring for ParameterStability"""
-	pass
+	def GetRMSE(process, dynamic):
+		"""docstring for GetRMSE"""
+		if dynamic == True:
+			filename = "../Calibration Results/Dynamic/" + process + ".csv" 
+		else:
+			filename = "../Calibration Results/Static/" + process + ".csv"
+		
+		with open(filename, 'rb') as f:
+			reader = csv.reader(f)
+			RMSE = [float(row[-1]) for row in reader]
+		# print RMSE
+		return RMSE
+	
+	def PlotRMSEs(process):
+		pretty_mapping = {
+			'IGOU': 'Inverse Gaussian-OU',
+			'GOU' : 'Gamma-OU',
+			'CIR' : 'CIR',
+			'HP'  : 'HP',
+			'IHP' : 'IHP',
+		}
+		
+		
+		"""docstring for PlotRMSE"""
+		dynamic_rmse = GetRMSE(process, True)
+		static_rmse = GetRMSE(process, False)
+		lower = np.concatenate((dynamic_rmse,static_rmse)).min()	
+		upper = np.concatenate((dynamic_rmse,static_rmse)).max()	
+		bounds = (lower, upper)
+		
+		
+		pylab.figure(1)
+		
+		pylab.clf()
+		pylab.subplot(1,2,1)
 
+		if AUTOCOLOR:
+			homon = pylab.hist(dynamic_rmse, range = bounds, color = AUTOCOLOR_COLORS[0])
+		else:
+			homon = pylab.hist(dynamic_rmse, range = bounds, color = "black")
+
+		pylab.title('Dynamic')
+		pylab.xlabel('RMSE')
+		pylab.ylabel('Frequency')
+
+		pylab.subplot(1,2,2)
+		# pylab.clf()
+		if AUTOCOLOR:
+			homon = pylab.hist(static_rmse, range = bounds, color = AUTOCOLOR_COLORS[1])
+		else:
+			homon = pylab.hist(static_rmse, range = bounds, color = "grey")
+		pylab.rc('text', usetex=True)
+		
+		pylab.title('Static')
+		pylab.xlabel('RMSE')
+		pylab.ylabel('Frequency')
+
+		# pylab.subplots_adjust(bottom=0.15)
+		pylab.subplots_adjust(wspace=0.4)
+		pylab.suptitle(pretty_mapping[process] + " RMSE")
+		
+		pdf_file = "../../Diagrams/ParameterStability/" + process + ".pdf"
+		pylab.savefig(pdf_file)
+		# pylab.show()
+
+		# pylab.show()
+	
+	for process in ['IHP', 'CIR', 'GOU', 'IGOU', 'HP']:
+		PlotRMSEs(process)
+	
+	print "Parameter Stability Completed"
+		
+def Print (self):
+	"""docstring for Print """
+	pass		
 	
 if __name__ == '__main__':
-	CDSIssuance()
-	CDSCashflows()
-	CDSTermStructure()
-	IntensityStructure()
-	ParSpreadAndSurvivalProbabilities()
-	TimeSeriesPlot()
-	LevyProcessPlots()
-	
+	# CDSIssuance()
+	# CDSCashflows()
+	# CDSTermStructure()
+	# IntensityStructure()
+	# ParSpreadAndSurvivalProbabilities()
+	# TimeSeriesPlot()
+	# LevyProcessPlots()
+	ParameterStability()
