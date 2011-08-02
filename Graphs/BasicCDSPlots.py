@@ -1,10 +1,3 @@
-
-
-# Quarterly payments on a CDS of a two year tenor.
-# The notional is \$10,000,000, and the spread is
-# 200bps (2.00\%).We assume default occurs at 21 months, with a recovery rate of 40\%
-
-# import matplotlib
 import pylab
 from pylab import arange,pi,sin,cos,sqrt
 import numpy as np
@@ -516,12 +509,14 @@ def LevyProcessPlots():
 
 def ParameterStabilityRMSE():
 	"""docstring for ParameterStability"""
+	pylab.rcParams.update(params)
+	
 	def GetRMSE(process, dynamic):
 		"""docstring for GetRMSE"""
 		if dynamic == True:
-			filename = "../Calibration Results/Dynamic/" + process + ".csv" 
+			filename = "../Calibration Results/CDX/Dynamic/" + process + ".csv" 
 		else:
-			filename = "../Calibration Results/Static/" + process + ".csv"
+			filename = "../Calibration Results/CDX/Static/" + process + ".csv"
 		
 		with open(filename, 'rb') as f:
 			reader = csv.reader(f)
@@ -575,8 +570,8 @@ def ParameterStabilityRMSE():
 		# pylab.suptitle(pretty_mapping[process] + " RMSE")
 		
 		pdf_file = "../../Diagrams/ParameterStability/" + process + ".pdf"
+
 		pylab.savefig(pdf_file)
-		# pylab.show()
 
 		# pylab.show()
 	
@@ -592,9 +587,9 @@ def ParameterStabilityParameters():
 	def GetParameters(process, dynamic):
 		"""docstring for GetRMSE"""
 		if dynamic == True:
-			filename = "../Calibration Results/Dynamic/" + process + ".csv" 
+			filename = "../Calibration Results/CDX/Dynamic/" + process + ".csv" 
 		else:
-			filename = "../Calibration Results/Static/" + process + ".csv"
+			filename = "../Calibration Results/CDX/Static/" + process + ".csv"
 		
 		def DateFromString(string):
 			"""docstring for DateFromString"""
@@ -644,7 +639,7 @@ def ParameterStabilityParameters():
 		for i, param in enumerate(parameter_names):
 			dynamic_values = dynamic_parameters[i]
 			static_values = static_parameters[i]
-			
+
 			pylab.subplot(2,2,i)
 			
 			if AUTOCOLOR:
@@ -657,11 +652,15 @@ def ParameterStabilityParameters():
 			# pylab.title('Stability of $' + param + '$')
 			# pylab .xlabel('Year')
 			pylab.ylabel('$' + param + '$')
+			# loc = mpl.dates.MonthLocator(1)
+			# 		dateFmt = mpl.dates.DateFormatter('%b %y')
+			# 		pylab.gca().xaxis.set_major_formatter(dateFmt)	
+			# 		# 
+			# 		pylab.gca().xaxis.set_major_locator(loc)
+			# 	
+			
+				
 			# pylab.legend()
-			# dateFmt = mpl.dates.DateFormatter('%b %y')
-			# loc = mpl.dates.WeekLocator(1)
-			# pylab.gca().xaxis.set_major_locator(loc)
-			# pylab.gca().xaxis.set_major_formatter(dateFmt)	
 			
 			
 		# pylab.subplots_adjust(bottom=0.15)
@@ -683,6 +682,7 @@ def ParameterStabilityParameters():
 
 	
 if __name__ == '__main__':
+	pass
 	# CDSIssuance()
 	# CDSCashflows()
 	# CDSTermStructure()
@@ -690,5 +690,5 @@ if __name__ == '__main__':
 	# ParSpreadAndSurvivalProbabilities()
 	# TimeSeriesPlot()
 	# LevyProcessPlots()
-	ParameterStabilityRMSE()
+	# ParameterStabilityRMSE()
 	# ParameterStabilityParameters()
