@@ -19,6 +19,8 @@ from MarketData import *
 from pylab import exp as vec_exp
 from PoissonCalibration import *
 import csv
+import datetime
+import matplotlib as mpl
 
 AUTOCOLOR = 1
 AUTOCOLOR_COLORS = ("#348ABD", "#7A68A6", "#A60628", "#467821", "#CF4457", "#188487", "#E24A33")
@@ -36,6 +38,7 @@ params = {'backend': 'pdf',
           'legend.fontsize': 8,
           'xtick.labelsize': 8,
           'ytick.labelsize': 8,
+		  'title.fontsize' : 8,
           'text.usetex'		: True,
           'figure.figsize': fig_size,
 		  # 'axes.color_cycle'    : ("#348ABD", "#7A68A6", "A60628", "467821", "CF4457", "188487", "E24A33"),
@@ -409,7 +412,6 @@ def ParSpreadAndSurvivalProbabilities():
 	print "Par Spread and Probabilities Completed"
 
 def TimeSeriesPlot():
-	import matplotlib as mpl
 	"""docstring for TimeSeriesPlot"""
 	def GetData(CreditDerivativeCSV, maturity):
 		"""docstring for GetData"""
@@ -583,8 +585,105 @@ def ParameterStabilityRMSE():
 	for process in ['IHP', 'CIR', 'GOU', 'IGOU', 'HP']:
 		PlotRMSEs(process)
 	
-	print "Parameter Stability Completed"
+	print "Parameter Stability RMSE Completed"
+
+def ParameterStabilityParameters():
+	"""docstring for ParameterStability"""
+	
+	pylab.rcParams.update(params)
+	
+	def GetParameters(process, dynamic):
+		"""docstring for GetRMSE"""
+		if dynamic == True:
+			filename = "../Calibration Results/Dynamic/" + process + ".csv" 
+		else:
+			filename = "../Calibration Results/Static/" + process + ".csv"
 		
+		def DateFromString(string):
+			"""docstring for DateFromString"""
+			lists = string.split('/')
+			return datetime.date(2000 + int(lists[2]), int(lists[1]), int(lists[0]))
+		
+		with open(filename, 'rb') as f:
+			reader = csv.reader(f)
+			str_parameters = [row[0:-1] for row in reader]
+			parameters = []
+			for i in range(len(str_parameters[0])):
+				if i == 0:
+					str_dates = [row[0] for row in str_parameters]
+					dates = [DateFromString(string) for string in str_dates]
+					# print dates
+				else:
+					values = [float(row[i]) for row in str_parameters]
+					parameters.append(values)
+			
+		return dates, parameters
+
+	def PlotParameters(process):
+		"""docstring for PlotRMSE"""
+		
+		mapping = {
+			'IGOU': ['Inverse Gaussian-OU', ['\\gamma', 'a', 'b', '\\lambda_0'] ],
+			'GOU' : [ 'Gamma-OU', ['\\gamma', 'a', 'b', '\\lambda_0'] ],
+			'CIR' : ['CIR', ['\\kappa', '\\nu', '\\gamma', '\\lambda_0'] ], 	
+}
+
+
+		dates, dynamic_parameters = GetParameters(process, True)
+		dates, static_parameters = GetParameters(process, False)
+		
+		# print dates
+		# print dynamic_parameters
+		
+		
+		parameter_names = mapping[process][1]
+		process_name = mapping[process][0]
+		
+
+		pylab.clf()
+		
+		pylab.figure(1)
+		
+		for i, param in enumerate(parameter_names):
+			dynamic_values = dynamic_parameters[i]
+			static_values = static_parameters[i]
+			
+			pylab.subplot(2,2,i)
+			
+			if AUTOCOLOR:
+				dyn = pylab.plot(dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
+				stat = pylab.plot(static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+			else:
+				dyn = pylab.plot(dates, dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
+				stat = pylab.plot(dates, static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+				
+			# pylab.title('Stability of $' + param + '$')
+			# pylab .xlabel('Year')
+			pylab.ylabel('$' + param + '$')
+			# pylab.legend()
+			# dateFmt = mpl.dates.DateFormatter('%b %y')
+			# loc = mpl.dates.WeekLocator(1)
+			# pylab.gca().xaxis.set_major_locator(loc)
+			# pylab.gca().xaxis.set_major_formatter(dateFmt)	
+			
+			
+		# pylab.subplots_adjust(bottom=0.15)
+		
+		pylab.subplots_adjust(wspace=0.4)
+		 # pylab.suptitle(process_name)
+
+		pdf_file = "../../Diagrams/ParameterStability/" + process + "Parameters.pdf"
+		pylab.savefig(pdf_file)
+		# pylab.show()
+
+		# pylab.show()
+	
+
+	for process in ['CIR', 'GOU', 'IGOU']:
+		PlotParameters(process)
+
+	print "Parameter Stability Parameters Completed"
+
 	
 if __name__ == '__main__':
 	# CDSIssuance()
@@ -592,6 +691,7 @@ if __name__ == '__main__':
 	# CDSTermStructure()
 	# IntensityStructure()
 	# ParSpreadAndSurvivalProbabilities()
-	# TimeSeriesPlot()
+	TimeSeriesPlot()
 	# LevyProcessPlots()
-	ParameterStabilityRMSE()
+	# ParameterStabilityRMSE()
+	ParameterStabilityParameters()
