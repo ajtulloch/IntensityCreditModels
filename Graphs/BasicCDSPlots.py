@@ -618,6 +618,12 @@ def RMSEDensity():
 		xs = np.linspace(lower, upper, 200)
 		dynamic_kde = stats.gaussian_kde(dynamic_rmse)
 		static_kde = stats.gaussian_kde(static_rmse)
+		
+		dynamic_kde.covariance_factor = lambda : .25
+		dynamic_kde._compute_covariance()
+
+		static_kde.covariance_factor = lambda : .25
+		static_kde._compute_covariance()
 
 		
 		pylab.figure(1)

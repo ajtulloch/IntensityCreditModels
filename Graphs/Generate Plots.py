@@ -7,7 +7,7 @@ if __name__ == '__main__':
 	# CDSTermStructure()
 	# IntensityStructure()
 	# ParSpreadAndSurvivalProbabilities()
-	TimeSeriesPlot()
+	# TimeSeriesPlot()
 	# LevyProcessPlots()
 	# ParameterStabilityRMSE()
 	# ParameterStabilityParameters()
