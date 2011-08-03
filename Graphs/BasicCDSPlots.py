@@ -37,7 +37,7 @@ params = {'backend': 'pdf',
 		  # 'axes.color_cycle'    : ("#348ABD", "#7A68A6", "A60628", "467821", "CF4457", "188487", "E24A33"),
 		  'figure.subplot.bottom': 0.12,
 		  'font.family' : 'serif',
-		  # 'font.serif' : ['Minion Pro']
+		  'font.serif' : ['Minion Pro']
 			}
 
 pylab.rcParams.update(params)
@@ -666,7 +666,7 @@ def ParameterStabilityParameters():
 		# pylab.subplots_adjust(bottom=0.15)
 		
 		pylab.subplots_adjust(wspace=0.4)
-		 # pylab.suptitle(process_name)
+		pylab.suptitle(process_name)
 
 		pdf_file = "../../Diagrams/ParameterStability/" + process + "Parameters.pdf"
 		pylab.savefig(pdf_file)
