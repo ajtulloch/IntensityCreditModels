@@ -61,13 +61,13 @@ def main():
 	# 	    writer.writerows(zipped)
 	# 	
 		# CDX Data
-	for Calib in [CIR, GOU, IGOU]:
+	for Calib in [GOU, IGOU]:
 
 		x = PoissonCalibrationMaster( 	CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
 										Calib,
 										)
 		print Calib.Process
-		results =  x.Calibrate(debug = 0, N = 1000, dynamic = False)
+		results =  x.Calibrate(debug = 1, N = 500, dynamic = False)
 		output =  x.FormatResults(results)
 		# print output 
 		zipped = zip(*output)
@@ -77,7 +77,7 @@ def main():
 		    writer = csv.writer(f)
 		    writer.writerows(zipped)
 
-		results =  x.Calibrate(debug = 0, N = 1000, dynamic = True)
+		results =  x.Calibrate(debug = 1, N = 500, dynamic = True)
 		output =  x.FormatResults(results)
 		# print output 
 		zipped = zip(*output)
@@ -87,9 +87,6 @@ def main():
 		    writer = csv.writer(f)
 		    writer.writerows(zipped)
 
-
-
-	
 if __name__ == '__main__':
 	main()
 	

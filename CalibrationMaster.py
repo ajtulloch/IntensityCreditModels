@@ -32,14 +32,16 @@ class PoissonCalibrationMaster(CalibrationMaster):
 		for date in dates:
 			Data = MarketData(self.CSVData.TimeSlice(date))
 			self.PoissonCalibration.MarketData = Data
-			intensity = self.PoissonCalibration.Calibrate()
-			RMSE = self.PoissonCalibration.RMSE()
-			if debug == 1:
-				print "Date: %s \tParameters: %s" %(date, intensity)
-			results.append((date, intensity, RMSE) ) 
-			if dynamic == True:
-				self.PoissonCalibration.Guess = intensity
-			
+			try:
+				intensity = self.PoissonCalibration.Calibrate()
+				RMSE = self.PoissonCalibration.RMSE()
+				if debug == 1:
+					print "Date: %s \tParameters: %s" %(date, intensity)
+				results.append((date, intensity, RMSE) ) 
+				if dynamic == True:
+					self.PoissonCalibration.Guess = intensity
+			except:
+				pass
 		if debug == 1:
 			self.PoissonCalibration.CalibrationResults()
 		self.results = results

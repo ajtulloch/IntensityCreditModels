@@ -636,7 +636,7 @@ def RMSEDensity():
 			pass
 		
 		pylab.legend()
-		pylab.title(pretty_mapping[process])
+		pylab.title(pretty_mapping[process], fontsize = 10)
 		pylab.xlabel('RMSE')
 		pylab.ylabel('Frequency')
 
