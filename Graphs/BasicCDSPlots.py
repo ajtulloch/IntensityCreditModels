@@ -26,8 +26,9 @@ fig_width = fig_width_pt*inches_per_pt  # width in inches
 fig_height = fig_width*golden_mean      # height in inches
 fig_size =  [fig_width, fig_height]
 params = {'backend': 'pdf',
-          'axes.labelsize': 10,
-          'text.fontsize': 10,
+          'axes.labelsize':  8,
+          'text.fontsize':   8,
+		  'suptitle.fontsize': 8,
           'legend.fontsize': 8,
           'xtick.labelsize': 8,
           'ytick.labelsize': 8,
@@ -567,7 +568,7 @@ def ParameterStabilityRMSE():
 
 		# pylab.subplots_adjust(bottom=0.15)
 		pylab.subplots_adjust(wspace=0.4)
-		# pylab.suptitle(pretty_mapping[process] + " RMSE")
+		pylab.suptitle(pretty_mapping[process], fontsize=10)
 		
 		pdf_file = "../../Diagrams/ParameterStability/" + process + ".pdf"
 
@@ -579,6 +580,72 @@ def ParameterStabilityRMSE():
 		PlotRMSEs(process)
 		
 	print "Parameter Stability RMSE Completed"
+
+
+def RMSEDensity():
+	"""docstring for RMSEDensity"""
+	pylab.rcParams.update(params)
+	
+	def GetRMSE(process, dynamic):
+		"""docstring for GetRMSE"""
+		if dynamic == True:
+			filename = "../Calibration Results/CDX/Dynamic/" + process + ".csv" 
+		else:
+			filename = "../Calibration Results/CDX/Static/" + process + ".csv"
+		
+		with open(filename, 'rb') as f:
+			reader = csv.reader(f)
+			RMSE = [float(row[-1]) for row in reader]
+		# print RMSE
+		return RMSE
+	
+	def PlotRMSEs(process):
+		pretty_mapping = {
+			'IGOU': 'Inverse Gaussian-OU',
+			'GOU' : 'Gamma-OU',
+			'CIR' : 'CIR',
+			'HP'  : 'HP',
+			'IHP' : 'IHP',
+		}
+		
+		
+		"""docstring for PlotRMSE"""
+		dynamic_rmse = GetRMSE(process, True)
+		static_rmse = GetRMSE(process, False)
+		lower = np.concatenate((dynamic_rmse,static_rmse)).min()	
+		upper = np.concatenate((dynamic_rmse,static_rmse)).max()	
+
+		xs = np.linspace(lower, upper, 200)
+		dynamic_kde = stats.gaussian_kde(dynamic_rmse)
+		static_kde = stats.gaussian_kde(static_rmse)
+
+		
+		pylab.figure(1)
+		pylab.clf()
+		
+		if AUTOCOLOR:
+			dynamic = pylab.plot(xs, dynamic_kde(xs), color = AUTOCOLOR_COLORS[0], label = "Dynamic")
+			static = pylab.plot(xs, static_kde(xs), color = AUTOCOLOR_COLORS[1], label = "Static")
+		else:
+			pass
+		
+		pylab.legend()
+		pylab.title(pretty_mapping[process])
+		pylab.xlabel('RMSE')
+		pylab.ylabel('Frequency')
+
+		
+		pdf_file = "../../Diagrams/ParameterStability/" + process + "Density.pdf"
+
+		pylab.savefig(pdf_file)
+
+		# pylab.show()
+	
+	for process in ['CIR', 'GOU', 'IGOU']:
+		PlotRMSEs(process)
+		
+	print "Density RMSE Completed"
+	
 
 def ParameterStabilityParameters():
 	"""docstring for ParameterStability"""
@@ -660,13 +727,13 @@ def ParameterStabilityParameters():
 			# 	
 			
 				
-			# pylab.legend()
+			pylab.legend()
 			
 			
 		# pylab.subplots_adjust(bottom=0.15)
 		
 		pylab.subplots_adjust(wspace=0.4)
-		pylab.suptitle(process_name)
+		pylab.suptitle(process_name, fontsize = 10)
 
 		pdf_file = "../../Diagrams/ParameterStability/" + process + "Parameters.pdf"
 		pylab.savefig(pdf_file)
