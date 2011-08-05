@@ -1,4 +1,4 @@
 *.pyc
 Calibration Results/
-Graphs/Generate Plots.py
+Graphs/GeneratePlots.py
 ParameterStabilityAnalysis.py

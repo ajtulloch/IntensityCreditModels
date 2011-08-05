@@ -85,29 +85,6 @@ class PoissonCalibration(object):
 		print string
 		return None	
 		
-	# def TimeSeries(self, xs, flag):
-	# 	"""docstring for TimeSeries"""
-	# 	results = []
-	# 	if flag == "SurvivalProbability":	
-	# 		for x in xs:
-	# 			CDS = self.CDS( DiscountCurve = self.DiscountCurve)
-	# 			
-	# 			prob = CDS.SurvivalProbability(self.calibrated_gamma, x)
-	# 			results.append(prob)
-	# 			
-	# 	elif flag == "ParSpread":	
-	# 		for x in xs:
-	# 			
-	# 			CDS = self.CDS(maturity = x, DiscountCurve = self.DiscountCurve)
-	# 			if self.Process == "IHP":
-	# 				CDS.tenors = self.tenors
-	# 			
-	# 			spread = CDS.ParSpread(self.calibrated_gamma)
-	# 			results.append(spread)
-	# 	else:
-	# 		Exception( "Flag not recognised")		
-	# 	return results	
-
 	def PrintParameters(self):
 		"""docstring for PrintParameters"""
 		string = ""
@@ -164,7 +141,6 @@ class InhomogenousPoissonCalibration(PoissonCalibration):
 		
 		RMSE = sqrt(sum/N)
 		return RMSE
-	
 	
 	def CalibrationResults(self):
 		"""docstring for CalibrationError"""
