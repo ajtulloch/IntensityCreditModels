@@ -1,20 +1,23 @@
+
 import pylab
 from pylab import arange,pi,sin,cos,sqrt
 import numpy as np
 import random
 from scipy import vectorize, stats
 import sys
-sys.path.append("../")
-from CDS import *
 from pylab import exp as vec_exp
-# from CDS import *
-from MarketData import *
-from pylab import exp as vec_exp
-from PoissonCalibration import *
 import csv
 import datetime
 import matplotlib as mpl
 
+#------------------------------------------------------------------------------
+sys.path.append("../")
+from CDS import *
+from MarketData import *
+from pylab import exp as vec_exp
+from Calibration import *
+
+#------------------------------------------------------------------------------
 AUTOCOLOR = 1
 AUTOCOLOR_COLORS = ("#348ABD", "#7A68A6", "#A60628", "#467821", "#CF4457", "#188487", "#E24A33")
 
@@ -42,6 +45,8 @@ params = {'backend': 'pdf',
 			}
 
 pylab.rcParams.update(params)
+
+#------------------------------------------------------------------------------
 
 def CDSCashflows( barcolour = "grey"):
 	"""Creates the chart"""
@@ -80,6 +85,8 @@ def CDSCashflows( barcolour = "grey"):
 	pylab.xlabel('Months' )
 	pylab.savefig('../../Diagrams/CDSPaymentBarChart.pdf')
 	print "CDS Payment Schedule Completed"
+
+#------------------------------------------------------------------------------
 
 def CDSIssuance( barcolour = "grey", fig_width = 469.7549 ):
 	"""docstring for CDSIssuance"""
@@ -132,7 +139,7 @@ def CDSIssuance( barcolour = "grey", fig_width = 469.7549 ):
 	# pylab.show()
 	print "CDS and CDO Issuance Completed"
 
-
+#------------------------------------------------------------------------------
 
 def CDSTermStructure():
 	"""docstring for CDSTermStructure"""
@@ -176,6 +183,7 @@ def CDSTermStructure():
 	print "CDS Term Structure Diagram Completed"
 	# pylab.show()
 
+#------------------------------------------------------------------------------
 
 def IntensityStructure():
 	"""docstring for fname"""
@@ -256,6 +264,7 @@ def IntensityStructure():
 	# pylab.show()
 	print "Poisson Default Intensity Term Structure Completed"
 
+#------------------------------------------------------------------------------
 
 def ParSpreadAndSurvivalProbabilities():
 	"""docstring for ParSpreadAndSurvivalProbabilities"""
@@ -406,6 +415,8 @@ def ParSpreadAndSurvivalProbabilities():
 	pylab.savefig('../../Diagrams/ProcessParSpreads.pdf')
 	print "Par Spread and Probabilities Completed"
 
+#------------------------------------------------------------------------------
+
 def TimeSeriesPlot():
 	"""docstring for TimeSeriesPlot"""
 	def GetData(CreditDerivativeCSV, maturity):
@@ -508,6 +519,8 @@ def LevyProcessPlots():
 	print "Process Simulations Completed"
 	# pylab.show()
 
+#------------------------------------------------------------------------------
+
 def ParameterStabilityRMSE():
 	"""docstring for ParameterStability"""
 	pylab.rcParams.update(params)
@@ -581,6 +594,7 @@ def ParameterStabilityRMSE():
 		
 	print "Parameter Stability RMSE Completed"
 
+#------------------------------------------------------------------------------
 
 def RMSEDensity():
 	"""docstring for RMSEDensity"""
@@ -645,6 +659,7 @@ def RMSEDensity():
 		
 	print "Density RMSE Completed"
 	
+#------------------------------------------------------------------------------
 
 def ParameterStabilityParameters():
 	"""docstring for ParameterStability"""
@@ -745,16 +760,3 @@ def ParameterStabilityParameters():
 		PlotParameters(process)
 
 	print "Parameter Stability Parameters Completed"
-
-	
-if __name__ == '__main__':
-	pass
-	# CDSIssuance()
-	# CDSCashflows()
-	# CDSTermStructure()
-	# IntensityStructure()
-	# ParSpreadAndSurvivalProbabilities()
-	# TimeSeriesPlot()
-	# LevyProcessPlots()
-	# ParameterStabilityRMSE()
-	# ParameterStabilityParameters()

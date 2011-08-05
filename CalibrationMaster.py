@@ -2,7 +2,7 @@ from CreditDerivativeCSVReader import *
 from CDS import *
 from DiscountCurve import *
 from MarketData import *
-from PoissonCalibration import *
+from Calibration import *
 
 #------------------------------------------------------------------------------
 
