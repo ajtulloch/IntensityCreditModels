@@ -32,8 +32,7 @@ class CalibrationMaster(object):
 				intensity = self.Calibration.Calibrate()
 				RMSE = self.Calibration.RMSE()
 				if debug == 1:
-					print "Date: %s \tParameters: %s\tRMSE: %.2f" \
-							% (date, intensity, RMSE)
+					print "Date: %s \tParameters: %s" %(date, intensity)
 				results.append((date, intensity, RMSE) ) 
 				if dynamic == True:
 					self.Calibration.Guess = intensity
