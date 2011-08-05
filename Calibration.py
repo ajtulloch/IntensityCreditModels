@@ -7,11 +7,11 @@ from math import sqrt
 # from scipy import memoize
 
 
-class PoissonCalibration(object):
-	"""docstring for PoissonCalibration"""
+class Calibration(object):
+	"""docstring for Calibration"""
 	def __init__(self, DiscountCurve = FlatDiscountCurve(r = 0.0), \
 	 		MarketData = None, CDS = None, Process = None, Guess = None):
-		super(PoissonCalibration, self).__init__()
+		super(Calibration, self).__init__()
 		self.DiscountCurve = DiscountCurve
 		self.MarketData = MarketData
 		self.R = 0.4
@@ -96,11 +96,11 @@ class PoissonCalibration(object):
 		return string
 #------------------------------------------------------------------------------
 
-class InhomogenousPoissonCalibration(PoissonCalibration):
-	"""docstring for HomogenousPoissonCalibration"""
+class InhomogenousCalibration(Calibration):
+	"""docstring for HomogenousCalibration"""
 	def __init__(self, DiscountCurve = FlatDiscountCurve( r = 0 ), \
 															MarketData = None):
-		super(InhomogenousPoissonCalibration, self).__init__(DiscountCurve, MarketData)
+		super(InhomogenousCalibration, self).__init__(DiscountCurve, MarketData)
 		self.Process = "IHP"
 		self.CDS = IHPCreditDefaultSwap
 		if MarketData is not None:
@@ -180,14 +180,14 @@ if __name__ == '__main__':
 	# print z.Data()
 	# print z.Date()
 	
-	HP = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	HP = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								MarketData 		= z,
 								CDS				= HPCreditDefaultSwap,
 								Process			= "HP",
 								Guess			= [0.01],
 								)
 
-	CIR = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	CIR = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								MarketData 		= z,
 								CDS 			= CIRCreditDefaultSwap,
 								Process			= "CIR",
@@ -195,19 +195,19 @@ if __name__ == '__main__':
 								)
 										
 										
-	IHP = InhomogenousPoissonCalibration( \
+	IHP = InhomogenousCalibration( \
 								DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								MarketData 		= z,
 								)
 	
-	GOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	GOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								MarketData 		= z,
 								CDS				= GammaOUCreditDefaultSwap,
 								Process			= "G-OU",
 								Guess			= [0.2, 189, 10000, 0.002],
 								)
 						
-	IGOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	IGOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								MarketData 		= z,
 								CDS 			= IGOUCreditDefaultSwap,
 								Process			= "IG-OU",

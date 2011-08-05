@@ -6,18 +6,14 @@ from PoissonCalibration import *
 
 #------------------------------------------------------------------------------
 
-class CalibrationMaster(object):
-	"""docstring for CalibrationMaster"""
-	def __init__(self):
-		super(CalibrationMaster, self).__init__()
 
 		
-class PoissonCalibrationMaster(CalibrationMaster):
+class CalibrationMaster(object):
 	"""docstring for CalibrationMaster"""
-	def __init__(self, CreditDerivativesCSVReader, PoissonCalibration):
+	def __init__(self, CreditDerivativesCSVReader, Calibration):
 		super(CalibrationMaster, self).__init__()
 		self.CSVData = CreditDerivativesCSVReader
-		self.PoissonCalibration = PoissonCalibration
+		self.Calibration = Calibration
 
 	def Calibrate(self, debug = 1, N = False, dynamic = True):
 		"""docstring for Calibrate"""
@@ -31,19 +27,19 @@ class PoissonCalibrationMaster(CalibrationMaster):
 		results = []
 		for date in dates:
 			Data = MarketData(self.CSVData.TimeSlice(date))
-			self.PoissonCalibration.MarketData = Data
+			self.Calibration.MarketData = Data
 			try:
-				intensity = self.PoissonCalibration.Calibrate()
-				RMSE = self.PoissonCalibration.RMSE()
+				intensity = self.Calibration.Calibrate()
+				RMSE = self.Calibration.RMSE()
 				if debug == 1:
 					print "Date: %s \tParameters: %s" %(date, intensity)
 				results.append((date, intensity, RMSE) ) 
 				if dynamic == True:
-					self.PoissonCalibration.Guess = intensity
+					self.Calibration.Guess = intensity
 			except:
 				pass
 		if debug == 1:
-			self.PoissonCalibration.CalibrationResults()
+			self.Calibration.CalibrationResults()
 		self.results = results
 		return results
 	
@@ -68,46 +64,46 @@ class PoissonCalibrationMaster(CalibrationMaster):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	# y = HomogenousPoissonCalibrationMaster( 
+	# y = HomogenousCalibrationMaster( 
 	# 			CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
-	# 			HomogenousPoissonCalibration(),)
+	# 			HomogenousCalibration(),)
 	# y.Calibrate()
 
-	# y = PoissonCalibrationMaster( 
+	# y = CalibrationMaster( 
 	# 			CreditDerivativeCSVReader(file = "../Data/iTraxx.csv"),
-	# 			InhomogenousPoissonCalibration())
+	# 			InhomogenousCalibration())
 				
-	HP = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	HP = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS				= HPCreditDefaultSwap,
 								Process			= "Homogenous Poisson",
 								Guess			= [0.01],
 								)
 
-	CIR = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	CIR = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS 			= CIRCreditDefaultSwap,
 								Process			= "CIR",
 								Guess			= [0.1, 0.3, 0.2, 0.02],
 								)
 
 
-	IHP = InhomogenousPoissonCalibration( \
+	IHP = InhomogenousCalibration( \
 								DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								)
 
-	GOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	GOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS				= GammaOUCreditDefaultSwap,
 								Process			= "Gamma OU",
 								Guess			= [0.2, 189, 10000, 0.002],
 								)
 
-	IGOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+	IGOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS 			= IGOUCreditDefaultSwap,
 								Process			= "Inverse Gamma OU",
 								Guess			= [0.3, 0.8, 5, 0.02],
 								)
 								
 	for Calib in [HP, IHP, CIR, GOU, IGOU]:
-		x = PoissonCalibrationMaster( 
+		x = CalibrationMaster( 
 							CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
 							Calib,
 							)
