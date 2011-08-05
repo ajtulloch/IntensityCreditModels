@@ -1,4 +1,8 @@
-# CDS Calibration
+# CDS Intensity Models
+
+---
+
+## Introduction
 
 This Python code contains utilities used to calibrate various intensity models to CDS spreads.
 
@@ -10,11 +14,10 @@ Intensity models are implemented by subclassing the `CreditDefaultSwap` class, i
 
 Calibration procedures are implemented in the `Calibration.py` script, and analysis of calibration results is contained in the script `ParameterStabilityAnalysis.py`.  
 
-## Supported Intensity Models
+## Implemented Intensity Models
 
-
-* Homogenous Poisson
-* Inhomogenous Poisson
-* Gamma-OU
-* Inverse Gamma-OU
+* Homogenous Poisson (HP)
+* Inhomogenous Poisson (IHP)
+* Gamma-OU (G-OU)
+* Inverse Gamma-OU (IG-OU)
 * Cox-Ingersoll-Ross (CIR)
