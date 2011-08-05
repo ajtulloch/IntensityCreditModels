@@ -33,7 +33,7 @@ def GenerateCSV():
 								Guess			= [0.3, 0.8, 5, 0.02],
 								)
 
-	for Calib in [GOU, IGOU]:
+	for Calib in [IHP]:
 
 		x = CalibrationMaster( \
 						CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
