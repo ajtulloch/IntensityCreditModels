@@ -1,19 +1,22 @@
 import csv
 from datetime import date as pydate
 
+#------------------------------------------------------------------------------
+
 class CreditDerivativeCSVReader(object):
-	"""docstring for CreditDerivativeCSVReader"""
+	"""Implements an interface for reading a CSV file containing term
+	structures of credit spreads."""
 	def __init__(self, file):
 		super(CreditDerivativeCSVReader, self).__init__()
 		self.file = file
 				
 	def DictData(self):
-		"""docstring for dict"""
+		"""Returns a dictionary object containing the CSV file data"""
 		reader = csv.DictReader( open( self.file, "rU" ), dialect = "excel" )
 		return reader
 		
 	def Dates(self):
-		"""docstring for dates"""
+		"""Returns list of dates in the CSV file"""
 		data = self.DictData()
 		dates = [ row[ "Date"] for row in data ]
 		return dates
@@ -33,9 +36,9 @@ class CreditDerivativeCSVReader(object):
 			# print yymmdd
 			return pydate(2000 + yymmdd[0], yymmdd[1], yymmdd[2])
 			
-		time_series = [ (convert_date(row[ "Date" ]), float(row[ header ]))for row in data ]
+		time_series = [ (convert_date(row[ "Date" ]), float(row[ header ])) \
+			for row in data ]
 		return time_series
-	
 	
 	def TimeSeries(self, header):
 		"""Returns an array of (date, value) tuples"""
@@ -46,7 +49,8 @@ class CreditDerivativeCSVReader(object):
 	def TimeSlice(self, date = None):
 		if date == None:
 			date = self.Dates()[0]
-		"""Returns a dictionary corresponding to the term structure at a given time"""
+		"""Returns a dictionary corresponding to the term structure at a given 
+		time.  Raises exception if otherwise"""
 		data = self.DictData()
 	 	for	i in data:
 			if i[ "Date" ] == date:
@@ -54,9 +58,8 @@ class CreditDerivativeCSVReader(object):
 		
 		raise Exception( "Date not found in data")
 		
-		
-		
+#------------------------------------------------------------------------------
+				
 if __name__ == '__main__':
 	Y = CreditDerivativeCSVReader( "../Data/CDX.csv" )
 	print Y.TimeSeries("5")
-	# print Y.PlotSeries("3")
