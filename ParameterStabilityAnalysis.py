@@ -1,10 +1,9 @@
 from CalibrationMaster import *
 import csv
 
+#------------------------------------------------------------------------------
 
-
-
-def main():
+def GenerateCSV():
 	"""docstring for main"""
 	HP = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS				= HPCreditDefaultSwap,
@@ -34,38 +33,13 @@ def main():
 								Guess			= [0.3, 0.8, 5, 0.02],
 								)
 
-	# for Calib in [HP, IHP, CIR, GOU, IGOU]:
-	# 
-	# 	x = PoissonCalibrationMaster( 	CreditDerivativeCSVReader(file = "../Data/iTraxxAU.csv"),
-	# 									Calib,
-	# 									)
-	# 	print Calib.Process
-	# 	results =  x.Calibrate(debug = 0, N = 210, dynamic = False)
-	# 	output =  x.FormatResults(results)
-	# 	# print output 
-	# 	zipped = zip(*output)
-	# 
-	# 	filename = "Calibration Results/AU/Static/" + Calib.Process + ".csv"
-	# 	with open(filename, 'wb') as f:
-	# 	    writer = csv.writer(f)
-	# 	    writer.writerows(zipped)
-	# 
-	# 	results =  x.Calibrate(debug = 0, N = 210, dynamic = True)
-	# 	output =  x.FormatResults(results)
-	# 	# print output 
-	# 	zipped = zip(*output)
-	# 
-	# 	filename = "Calibration Results/AU/Dynamic/" + Calib.Process + ".csv"
-	# 	with open(filename, 'wb') as f:
-	# 	    writer = csv.writer(f)
-	# 	    writer.writerows(zipped)
-	# 	
-		# CDX Data
 	for Calib in [GOU, IGOU]:
 
-		x = PoissonCalibrationMaster( 	CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
-										Calib,
-										)
+		x = PoissonCalibrationMaster( \
+						CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
+						Calib,
+						)
+		
 		print Calib.Process
 		results =  x.Calibrate(debug = 1, N = 500, dynamic = False)
 		output =  x.FormatResults(results)
@@ -87,8 +61,10 @@ def main():
 		    writer = csv.writer(f)
 		    writer.writerows(zipped)
 
+#------------------------------------------------------------------------------
+
 if __name__ == '__main__':
-	main()
+	GenerateCSV()
 	
 
 

@@ -17,7 +17,8 @@ class MarketData(object):
 	def Tenors(self):
 		"""docstring for Tenors"""
 		
-		tenors = [float(key) for key in self.data.iterkeys() if len(key) is not 4]
+		tenors = [float(key) for key in self.data.iterkeys() \
+					if len(key) is not 4]
 		return tenors
 		
 	def Date(self):
@@ -27,6 +28,7 @@ class MarketData(object):
 	def Data(self):
 		"""docstring for Data"""
 		
-		return [ (float(k),float(v) ) for k,v in self.data.iteritems() if len(k) is not 4]
+		return [ (float(k),float(v) ) for k,v in self.data.iteritems() \
+		 			if len(k) is not 4]
 		
 	

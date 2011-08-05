@@ -90,8 +90,9 @@ if __name__ == '__main__':
 								)
 
 
-	IHP = InhomogenousPoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-											)
+	IHP = InhomogenousPoissonCalibration( \
+								DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+								)
 
 	GOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS				= GammaOUCreditDefaultSwap,
@@ -111,7 +112,7 @@ if __name__ == '__main__':
 							Calib,
 							)
 		print Calib.Process
-		results =  x.Calibrate(debug = 0, N = 2)
+		results =  x.Calibrate(debug = 1, N = 2)
 		print x.FormatResults(results)
 		print 
 		

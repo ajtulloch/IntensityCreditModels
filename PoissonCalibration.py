@@ -9,7 +9,8 @@ from math import sqrt
 
 class PoissonCalibration(object):
 	"""docstring for PoissonCalibration"""
-	def __init__(self, DiscountCurve = FlatDiscountCurve(r = 0.0), MarketData = None, CDS = None, Process = None, Guess = None):
+	def __init__(self, DiscountCurve = FlatDiscountCurve(r = 0.0), \
+	 		MarketData = None, CDS = None, Process = None, Guess = None):
 		super(PoissonCalibration, self).__init__()
 		self.DiscountCurve = DiscountCurve
 		self.MarketData = MarketData
@@ -29,7 +30,6 @@ class PoissonCalibration(object):
 			CDS = self.CDS(	DiscountCurve = self.DiscountCurve,
 			 				maturity = t)
 			model_spread = CDS.ParSpread(gamma) 	
-			# print "t: %s\t Market Spread: %s\t Model Spread: %s\t" %(t, market_spread, model_spread)	
 			sum += (model_spread - market_spread) ** 2
 		return sum
 
@@ -60,7 +60,8 @@ class PoissonCalibration(object):
 	def CalibrationResults(self):
 		"""docstring for CalibrationError"""	
 		print "-" * 80
-		print "Calibration results for %s on %s" %(self.Process, self.MarketData.Date())
+		print "Calibration results for %s on %s" \
+			%(self.Process, self.MarketData.Date())
 		print ""
 		N = len(self.MarketData.Tenors())
 		string = self.Process
@@ -73,7 +74,8 @@ class PoissonCalibration(object):
 			if type(model_spread).__name__ == 'ndarray':
 				model_spread = model_spread[0]
 								
-			survival_probability = CDS.SurvivalProbability(self.calibrated_gamma, t) * 100
+			survival_probability = \
+				CDS.SurvivalProbability(self.calibrated_gamma, t) * 100
 			print 	"Tenor: %.1f\t Market: %.0f\t Model Spread: %.0f\t Survival Probability: %.1f" \
 			 		%(t, market_spread, model_spread, survival_probability)	
 			string += "\t&\t%.0f" % model_spread
@@ -96,7 +98,8 @@ class PoissonCalibration(object):
 
 class InhomogenousPoissonCalibration(PoissonCalibration):
 	"""docstring for HomogenousPoissonCalibration"""
-	def __init__(self, DiscountCurve = FlatDiscountCurve( r = 0 ), MarketData = None):
+	def __init__(self, DiscountCurve = FlatDiscountCurve( r = 0 ), \
+															MarketData = None):
 		super(InhomogenousPoissonCalibration, self).__init__(DiscountCurve, MarketData)
 		self.Process = "IHP"
 		self.CDS = IHPCreditDefaultSwap
@@ -192,9 +195,10 @@ if __name__ == '__main__':
 								)
 										
 										
-	IHP = InhomogenousPoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-											MarketData 		= z,
-											)
+	IHP = InhomogenousPoissonCalibration( \
+								DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+								MarketData 		= z,
+								)
 	
 	GOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								MarketData 		= z,
@@ -210,8 +214,8 @@ if __name__ == '__main__':
 								Guess			= [0.3, 0.8, 5, 0.02],
 								)
 	
-	for CDS in [HP, IHP, GOU, IGOU, CIR]:
-		CDS.Calibrate()
-		CDS.CalibrationResults()
+	for Credit in [HP, IHP, GOU, IGOU, CIR]:
+		Credit.Calibrate()
+		Credit.CalibrationResults()
 		
 		
