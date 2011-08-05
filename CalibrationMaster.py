@@ -5,8 +5,6 @@ from MarketData import *
 from Calibration import *
 
 #------------------------------------------------------------------------------
-
-
 		
 class CalibrationMaster(object):
 	"""docstring for CalibrationMaster"""

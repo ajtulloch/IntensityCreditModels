@@ -6,6 +6,7 @@ from MarketData import *
 from math import sqrt
 # from scipy import memoize
 
+#------------------------------------------------------------------------------
 
 class Calibration(object):
 	"""docstring for Calibration"""
@@ -20,7 +21,6 @@ class Calibration(object):
 		self.Guess = Guess
 		if MarketData is not None:
 			self.t0 = MarketData.Date() 
-			self.DiscountCurve.Initialise(self.t0)
 	
 	def ObjectiveFunction(self, gamma):
 		"""docstring for Calibration"""

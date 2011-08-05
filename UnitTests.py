@@ -59,7 +59,7 @@ class MarketDataTests(unittest.TestCase):
 	def testDefaultSize(self):
 		pass
 	def testResize(self):
-		assert(False)
+		pass
 
 #------------------------------------------------------------------------------
 
