@@ -30,11 +30,14 @@ class MarketDataTests(unittest.TestCase):
 	def setUp(self):
 		spreads = {'Date' : '17/5/10', '1' : '200', '2' : '250' }
 		self.mkt_data = MarketData.MarketData(spreads)
+
 	def tearDown(self):
 		pass
+
 	def testDate(self):
 		date = self.mkt_data.Date()
 		self.assertEqual(date, '17/5/10')
+		
 	def testTenors(self):
 		tenors = self.mkt_data.Tenors()
 		self.assertEqual(tenors, [1, 2])
