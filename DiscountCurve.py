@@ -7,7 +7,9 @@ class DiscountCurveBase(object):
 		super(DiscountCurveBase, self).__init__()
 		
 	def DF(self, t1, t2):
-		"""Subclass and implement"""
+		"""Subclass and implement.
+		
+		Returns the discount factor from t1 to t2."""
 		abstract
 	
 #------------------------------------------------------------------------------
