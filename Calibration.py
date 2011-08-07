@@ -11,7 +11,12 @@ from MarketData import *
 #------------------------------------------------------------------------------
 
 class Calibration(object):
-	"""docstring for Calibration"""
+	"""Defines a class for the calibration of CDS objects.
+	
+	Input a CDS class, a DiscountCurve object, and a MarketData object, 
+	along with an initial guess for parameters, and the Calibration object
+	can then be used to calibrate the CDS intensity process to market data.
+	"""
 	def __init__(self, DiscountCurve = FlatDiscountCurve(r = 0.0), \
 	 		MarketData = None, CDS = None, Process = None, Guess = None):
 		super(Calibration, self).__init__()
@@ -25,7 +30,10 @@ class Calibration(object):
 			self.t0 = MarketData.Date() 
 	
 	def ObjectiveFunction(self, gamma):
-		"""docstring for Calibration"""
+		"""Calculates the error in estimation for use in our calibration
+		routines.  
+		
+		Currently we use the L^2 norm."""
 
 		sum = 0
 		for t, market_spread in self.MarketData.Data():
@@ -36,7 +44,9 @@ class Calibration(object):
 		return sum
 
 	def Calibrate(self):
-		"""docstring for Calibrate"""
+		"""Performs the calibration and returns the optimal parameters.  
+		
+		The built in Optimise method in SciPy uses Nelder-Mead optimisation."""
 		output = optimise(	self.ObjectiveFunction, 
 							self.Guess, 
 							disp=0
@@ -45,15 +55,15 @@ class Calibration(object):
 		return output
 	
 	def RMSE(self):
-		"""docstring for RM"""
+		"""Returns the RMSE for the calibrated parameters."""
 		N = len(self.MarketData.Tenors())
 		return sqrt(self.ObjectiveFunction(self.calibrated_gamma) / N)
 
 	def CalibrationResults(self):
-		"""docstring for CalibrationError"""	
+		"""Outputs our calibration results."""	
 		print "-" * 80
 		print "Calibration results for %s on %s" \
-			%(self.Process, self.MarketData.Date())
+				% (self.Process, self.MarketData.Date())
 		print ""
 		N = len(self.MarketData.Tenors())
 		string = self.Process
@@ -80,7 +90,7 @@ class Calibration(object):
 		return None	
 		
 	def PrintParameters(self):
-		"""docstring for PrintParameters"""
+		"""Prints parameters for formatting in a LaTeX table."""
 		string = ""
 		for i, param in enumerate(self.calibrated_gamma):
 			string += "\t&\t$\lambda_%s = %.4f$\t" %(i, param)
@@ -89,7 +99,9 @@ class Calibration(object):
 #------------------------------------------------------------------------------
 
 class InhomogenousCalibration(Calibration):
-	"""docstring for HomogenousCalibration"""
+	"""As the IHP process requires us to specify the tenors for the calibration,
+	we must modify the __init__(), ObjectiveFunction(), and Calibrate() methods 
+	to correctly account for this."""
 	def __init__(self, DiscountCurve = FlatDiscountCurve( r = 0 ), \
 															MarketData = None):
 		super(InhomogenousCalibration, self).__init__(DiscountCurve, MarketData)
@@ -101,7 +113,10 @@ class InhomogenousCalibration(Calibration):
 			self.Guess = [ 0.01 ] * self.N
 		
 	def ObjectiveFunction(self, gamma):
-		"""docstring for Calibration"""
+		"""Calculates the error in estimation for use in our calibration
+		routines.  
+		
+		Currently we use the L^2 norm."""
 		sum = 0
 		for t, market_spread in self.MarketData.Data():
 			CDS = IHPCreditDefaultSwap(	tenors = sorted(self.MarketData.Tenors()), 
@@ -113,7 +128,9 @@ class InhomogenousCalibration(Calibration):
 		return sum
 	
 	def Calibrate(self):
-		"""docstring for Calibrate"""
+		"""Performs the calibration and returns the optimal parameters.  
+		
+		The built in Optimise method in SciPy uses Nelder-Mead optimisation."""
 		N = len(self.MarketData.Tenors())
 		self.Guess = [0.01] * N
 		output = optimise(	self.ObjectiveFunction, 
@@ -124,7 +141,7 @@ class InhomogenousCalibration(Calibration):
 		return output
 		
 	def CalibrationResults(self):
-		"""docstring for CalibrationError"""
+		"""Outputs our calibration results."""	
 		print "-" * 80
 		print "Calibration results for Inhomogenous Poisson on %s" %(self.MarketData.Date())
 		print ""
