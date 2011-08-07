@@ -123,7 +123,6 @@ class InhomogenousCalibration(Calibration):
 										DiscountCurve = self.DiscountCurve,
 			 							maturity = t)
 			model_spread = CDS.ParSpread(gamma)		
-			# print "t: %s\t Market Spread: %s\t Model Spread: %s\t" %(t, market_spread, model_spread)	
 			sum += (model_spread - market_spread) ** 2
 		return sum
 	
@@ -156,9 +155,8 @@ class InhomogenousCalibration(Calibration):
 			index = sorted(self.MarketData.Tenors()).index(t)
 			gamma = self.calibrated_gamma[index]
 			probability = CDS.SurvivalProbability( self.calibrated_gamma, t)*100
-			print "Tenor: %s\t Market: %.0f\t Model Spread: %.0f\t Gamma: %.5f\t Survival Probability: %.1f" %(t, market_spread, model_spread, gamma, probability)
-			# print "%.0f\t& %.0f\t & %.0f\t & %.5f\t & %.1f " %(t, market_spread, model_spread, gamma, probability)	
-			# print "\hline"	
+			print "Tenor: %s\t Market: %.0f\t Model Spread: %.0f\t Gamma: %.5f\t Survival Probability: %.1f" \
+			 		% (t, market_spread, model_spread, gamma, probability)
 			sum += (model_spread - market_spread) ** 2
 		
 		RMSE = sqrt(sum/N)
@@ -176,38 +174,38 @@ if __name__ == '__main__':
 	# print z.Date()
 	
 	HP = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-								MarketData 		= z,
-								CDS				= HPCreditDefaultSwap,
-								Process			= "HP",
-								Guess			= [0.01],
-								)
+						MarketData 		= z,
+						CDS				= HPCreditDefaultSwap,
+						Process			= "HP",
+						Guess			= [0.01],
+						)
 
 	CIR = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-								MarketData 		= z,
-								CDS 			= CIRCreditDefaultSwap,
-								Process			= "CIR",
-								Guess			= [0.1, 0.3, 0.2, 0.02],
-								)
+						MarketData 		= z,
+						CDS 			= CIRCreditDefaultSwap,
+						Process			= "CIR",
+						Guess			= [0.1, 0.3, 0.2, 0.02],
+						)
 										
 										
 	IHP = InhomogenousCalibration( \
-								DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-								MarketData 		= z,
-								)
+						DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
+						MarketData 		= z,
+						)
 	
 	GOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-								MarketData 		= z,
-								CDS				= GammaOUCreditDefaultSwap,
-								Process			= "G-OU",
-								Guess			= [0.2, 189, 10000, 0.002],
-								)
+						MarketData 		= z,
+						CDS				= GammaOUCreditDefaultSwap,
+						Process			= "G-OU",
+						Guess			= [0.2, 189, 10000, 0.002],
+						)
 						
 	IGOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
-								MarketData 		= z,
-								CDS 			= IGOUCreditDefaultSwap,
-								Process			= "IG-OU",
-								Guess			= [0.3, 0.8, 5, 0.02],
-								)
+						MarketData 		= z,
+						CDS 			= IGOUCreditDefaultSwap,
+						Process			= "IG-OU",
+						Guess			= [0.3, 0.8, 5, 0.02],
+						)
 	
 	for Credit in [HP, IHP, GOU, IGOU, CIR]:
 		Credit.Calibrate()
