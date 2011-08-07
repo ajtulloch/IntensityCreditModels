@@ -1,22 +1,29 @@
 import unittest
+
+#------------------------------------------------------------------------------
+
 import MarketData
 
 #------------------------------------------------------------------------------
 
 class CDSTests(unittest.TestCase):
 	pass
+	
 #------------------------------------------------------------------------------
 
 class CalibrationTests(unittest.TestCase):
 	pass
+	
 #------------------------------------------------------------------------------
 		
 class CalibrationMaster(unittest.TestCase):
 	pass
+	
 #------------------------------------------------------------------------------
 
 class CreditDerivateCSVReaderTests(unittest.TestCase):
 	pass
+	
 #------------------------------------------------------------------------------
 
 class MarketDataTests(unittest.TestCase):
@@ -36,7 +43,6 @@ class MarketDataTests(unittest.TestCase):
 		data = self.mkt_data.Data()
 		self.assertEqual(data, [(1, 200), (2, 250)])
 		
-
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
