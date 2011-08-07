@@ -7,14 +7,28 @@ from Calibration import *
 #------------------------------------------------------------------------------
 		
 class CalibrationMaster(object):
-	"""docstring for CalibrationMaster"""
+	"""The CalibrationMaster object is used to perform multiple calibrations, 
+	for example to analyse parameter stability or analyse distribution of 
+	calibrated RMSEs.
+	
+	Initialise with a calibration object and a CSVReader object."""
 	def __init__(self, CreditDerivativesCSVReader, Calibration):
 		super(CalibrationMaster, self).__init__()
 		self.CSVData = CreditDerivativesCSVReader
 		self.Calibration = Calibration
 
 	def Calibrate(self, debug = 1, N = False, dynamic = True):
-		"""docstring for Calibrate"""
+		"""Given a parameter N, representing the number of calibrations to 
+		perform, loops through the CSVReader N times, storing the results of
+		the calibration at each stage.  
+		
+		The method provides two methods for performing multiple calibrations.  
+		
+		The first, dynamic = True, uses the previous calibrationed data as an 
+		initial guess for the next calibration.
+		
+		The second, static (dynamic = False), uses the same initial guess for 
+		all calibrations."""
 		dates = self.CSVData.Dates()
 		
 		if N != False:
@@ -42,7 +56,8 @@ class CalibrationMaster(object):
 		return results
 	
 	def FormatResults(self, results):
-		"""docstring for FormatResults"""
+		"""Formats the results from our calibrations into a format suitable
+		for writing to a CSV."""
 		parameter_length = len(results[0][1]) 
 		# Number of parameters in output
 		output = []
@@ -57,20 +72,7 @@ class CalibrationMaster(object):
 
 #------------------------------------------------------------------------------
 
-
-
-#------------------------------------------------------------------------------
-
-if __name__ == '__main__':
-	# y = HomogenousCalibrationMaster( 
-	# 			CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
-	# 			HomogenousCalibration(),)
-	# y.Calibrate()
-
-	# y = CalibrationMaster( 
-	# 			CreditDerivativeCSVReader(file = "../Data/iTraxx.csv"),
-	# 			InhomogenousCalibration())
-				
+if __name__ == '__main__':				
 	HP = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 								CDS				= HPCreditDefaultSwap,
 								Process			= "Homogenous Poisson",
