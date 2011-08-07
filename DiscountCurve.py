@@ -14,7 +14,7 @@ class DiscountCurveBase(object):
 	
 #------------------------------------------------------------------------------
 						
-class FlatDiscountCurve(DiscountCurveBase):
+class FlatDiscountCurve(DiscountCuGrveBase):
 	"""Implements a DiscountCurve where the yield curve is constant r."""
 	def __init__(self, r):
 		super(FlatDiscountCurve, self).__init__()
