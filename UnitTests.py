@@ -45,7 +45,7 @@ class MarketDataTests(unittest.TestCase):
 	def testData(self):
 		data = self.mkt_data.Data()
 		self.assertEqual(data, [(1, 200), (2, 250)])
-		
+	
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
