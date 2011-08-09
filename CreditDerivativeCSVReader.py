@@ -52,14 +52,15 @@ class CreditDerivativeCSVReader(object):
 		"""Returns a dictionary corresponding to the term structure at a given 
 		time.  Raises exception if otherwise"""
 		data = self.DictData()
+		
 	 	for	i in data:
 			if i[ "Date" ] == date:
 				return i
 		
-		raise Exception( "Date not found in data")
+		raise Exception
 		
 #------------------------------------------------------------------------------
 				
 if __name__ == '__main__':
 	Y = CreditDerivativeCSVReader( "../Data/CDX.csv" )
-	print Y.TimeSeries("5")
+	print Y.TimeSlice()
