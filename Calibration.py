@@ -1,4 +1,4 @@
-from scipy.optimize import fmin as optimise
+import scipy.optimize as optimize
 from math import sqrt
 
 #------------------------------------------------------------------------------
@@ -18,16 +18,21 @@ class Calibration(object):
 	can then be used to calibrate the CDS intensity process to market data.
 	"""
 	def __init__(self, DiscountCurve = FlatDiscountCurve(r = 0.0), \
-	 		MarketData = None, CDS = None, Process = None, Guess = None):
+	 		MarketData = None, Method = "nm", CDS = None, Process = None, \
+	 		Guess = None):
 		super(Calibration, self).__init__()
 		self.DiscountCurve = DiscountCurve
-		self.MarketData = MarketData
 		self.R = 0.4
 		self.CDS = CDS
 		self.Process = Process
 		self.Guess = Guess
+		self.Method = Method
 		if MarketData is not None:
-			self.t0 = MarketData.Date() 
+			self.SetMarketData(MarketData)
+	
+	def SetMarketData(self, MarketData):
+		"""docstring for SetMarketData"""
+		self.MarketData = MarketData
 	
 	def ObjectiveFunction(self, gamma):
 		"""Calculates the error in estimation for use in our calibration
@@ -43,13 +48,24 @@ class Calibration(object):
 			sum += (model_spread - market_spread) ** 2
 		return sum
 
-	def Calibrate(self):
+	def Calibrate(self, method = 'nm'):
 		"""Performs the calibration and returns the optimal parameters.  
 		
 		The built in Optimise method in SciPy uses Nelder-Mead optimisation."""
+		methods = { 'nm'		: optimize.fmin, 
+					'powell' 	: optimize.fmin_powell,
+					'cg'		: optimize.fmin_cg,
+					'bfgs'		: optimize.fmin_bfgs
+					}
+		
+		if method == None:
+			optimise = methods[self.Method]
+		else:
+			optimise = methods[method]
+		
 		output = optimise(	self.ObjectiveFunction, 
 							self.Guess, 
-							disp=0
+							disp = 0
 							)
 		self.calibrated_gamma = output
 		return output
@@ -80,13 +96,13 @@ class Calibration(object):
 				CDS.SurvivalProbability(self.calibrated_gamma, t) * 100
 			print 	"Tenor: %.1f\t Market: %.0f\t Model Spread: %.0f\t Survival Probability: %.1f" \
 			 		%(t, market_spread, model_spread, survival_probability)	
-			string += "\t&\t%.0f" % model_spread
+			# string += "\t&\t%.0f" % model_spread
 			sum += (model_spread - market_spread) ** 2
 
 		RMSE = sqrt(sum/N)
 		print "RMSE: ", RMSE
-		string += "\t&\t%.2f\t&\t\\\\" % RMSE
-		print string
+		# string += "\t&\t%.2f\t&\t\\\\" % RMSE
+		# print string
 		return None	
 		
 	def PrintParameters(self):
@@ -103,15 +119,18 @@ class InhomogenousCalibration(Calibration):
 	we must modify the __init__(), ObjectiveFunction(), and Calibrate() methods 
 	to correctly account for this."""
 	def __init__(self, DiscountCurve = FlatDiscountCurve( r = 0 ), \
-															MarketData = None):
-		super(InhomogenousCalibration, self).__init__(DiscountCurve, MarketData)
+			MarketData = None, Method = "nm"):
+		super(InhomogenousCalibration, self).__init__(DiscountCurve, MarketData, Method)
 		self.Process = "IHP"
 		self.CDS = IHPCreditDefaultSwap
-		if MarketData is not None:
-			self.tenors = MarketData.Tenors()
-			self.N = len(MarketData.Tenors())
-			self.Guess = [ 0.01 ] * self.N
 		
+	def SetMarketData(self, MarketData):
+		"""docstring for SetMarketData"""
+		self.MarketData = MarketData
+		self.tenors = MarketData.Tenors()
+		self.N = len(MarketData.Tenors())
+		self.Guess = [ 0.01 ] * self.N
+	
 	def ObjectiveFunction(self, gamma):
 		"""Calculates the error in estimation for use in our calibration
 		routines.  
@@ -125,19 +144,6 @@ class InhomogenousCalibration(Calibration):
 			model_spread = CDS.ParSpread(gamma)		
 			sum += (model_spread - market_spread) ** 2
 		return sum
-	
-	def Calibrate(self):
-		"""Performs the calibration and returns the optimal parameters.  
-		
-		The built in Optimise method in SciPy uses Nelder-Mead optimisation."""
-		N = len(self.MarketData.Tenors())
-		self.Guess = [0.01] * N
-		output = optimise(	self.ObjectiveFunction, 
-							self.Guess, 
-							disp=0
-							)
-		self.calibrated_gamma = output
-		return output
 		
 	def CalibrationResults(self):
 		"""Outputs our calibration results."""	

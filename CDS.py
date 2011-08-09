@@ -232,7 +232,7 @@ if __name__ == '__main__':
 
 	print "G-OU"
 	y = GammaOUCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),  
-								maturity = 10,
+								maturity = 2,
 								)
 	
 	print y.ParSpread([ 0.2, 189, 10000, 0.002])		
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 	
 	print "IG-OU"
 	y = IGOUCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),  
-								maturity = 10,
+								maturity = 2,
 								)
 	
 	print y.ParSpread([ 0.3, 0.8, 5, 0.02])		
@@ -248,7 +248,7 @@ if __name__ == '__main__':
 	
 	print "CIR"
 	y = CIRCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),  
-								maturity = 10,
+								maturity = 2,
 								)
 	
 	print y.ParSpread([ 0.1, 0.3, 0.2, 0.02])

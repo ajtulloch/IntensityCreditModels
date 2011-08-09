@@ -4,7 +4,7 @@ import csv
 
 #------------------------------------------------------------------------------
 
-def GenerateCSV():
+def GenerateCSV(write_csv = False, debug = 1, NSims = 500):
 	"""docstring for main"""
 	HP = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.00), 
 						CDS				= HPCreditDefaultSwap,
@@ -43,30 +43,32 @@ def GenerateCSV():
 						)
 		
 		print Calib.Process
-		results =  x.Calibrate(debug = 1, N = 500, dynamic = False)
+		results =  x.Calibrate(debug = debug, N = NSims, dynamic = False)
 		output =  x.FormatResults(results)
 		# print output 
 		zipped = zip(*output)
 
-		filename = "Calibration Results/CDX/Static/" + Calib.Process + ".csv"
-		with open(filename, 'wb') as f:
-		    writer = csv.writer(f)
-		    writer.writerows(zipped)
+		if write_csv:
+			filename = "Calibration Results/CDX/Static/" + Calib.Process + ".csv"
+			with open(filename, 'wb') as f:
+			    writer = csv.writer(f)
+			    writer.writerows(zipped)
 
-		results =  x.Calibrate(debug = 1, N = 500, dynamic = True)
+		results =  x.Calibrate(debug = debug, N = NSims, dynamic = True)
 		output =  x.FormatResults(results)
 		# print output 
 		zipped = zip(*output)
 
-		filename = "Calibration Results/CDX/Dynamic/" + Calib.Process + ".csv"
-		with open(filename, 'wb') as f:
-		    writer = csv.writer(f)
-		    writer.writerows(zipped)
+		if write_csv:
+			filename = "Calibration Results/CDX/Dynamic/" + Calib.Process + ".csv"
+			with open(filename, 'wb') as f:
+			    writer = csv.writer(f)
+			    writer.writerows(zipped)
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	GenerateCSV()
+	GenerateCSV(write_csv = False, debug = 1, NSims = 2)
 	
 
 

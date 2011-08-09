@@ -39,7 +39,7 @@ class CalibrationMaster(object):
 		results = []
 		for date in dates:
 			Data = MarketData(self.CSVData.TimeSlice(date))
-			self.Calibration.MarketData = Data
+			self.Calibration.SetMarketData(Data)
 			try:
 				intensity = self.Calibration.Calibrate()
 				RMSE = self.Calibration.RMSE()
