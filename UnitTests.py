@@ -1,11 +1,12 @@
 import unittest
-import CDS
 
 #------------------------------------------------------------------------------
 
 import MarketData
 import DiscountCurve
 import CreditDerivativeCSVReader
+import Calibration
+import CDS
 
 #------------------------------------------------------------------------------
 
@@ -61,7 +62,37 @@ class CDSTests(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 class CalibrationTests(unittest.TestCase):
-	pass
+	def setUp(self):
+		"""docstring for setUp"""
+		CSV = CreditDerivativeCSVReader.CreditDerivativeCSVReader( file = "../Data/CDX.csv")
+		date = CSV.Dates()[-1]
+		data = CSV.TimeSlice(date)
+		z = MarketData.MarketData(data)
+		
+		self.HP = Calibration.Calibration(	
+				DiscountCurve 	= DiscountCurve.FlatDiscountCurve(r = 0.00), 
+				MarketData 		= z,
+				CDS				= CDS.HPCreditDefaultSwap,
+				Process			= "HP",
+				Guess			= [0.01],
+				)
+														
+		self.IHP = Calibration.InhomogenousCalibration( \
+				DiscountCurve 	= DiscountCurve.FlatDiscountCurve(r = 0.00), 
+				MarketData 		= z,
+				)
+							
+	def testCalibrate(self):
+		"""docstring for fname"""
+		HP_calib = self.HP.Calibrate()
+		IHP_calib = self.IHP.Calibrate()
+		print HP_calib[0], IHP_calib[0]
+		
+		self.assertEqual(round(HP_calib[0], 4), round(0.01240234, 4))
+		self.assertEqual(round(IHP_calib[0], 4), round(0.00487254926212, 4))
+		
+		# self.assertEqual(self.IHP.Calibrate(), [ 0.01240234])
+		
 	
 #------------------------------------------------------------------------------
 		
