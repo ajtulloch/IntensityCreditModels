@@ -1,7 +1,5 @@
 # CDS Intensity Models
 
----
-
 ## Introduction
 
 This Python code contains utilities used to calibrate various intensity models to CDS spreads.
