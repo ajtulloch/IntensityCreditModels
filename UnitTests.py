@@ -7,6 +7,7 @@ import DiscountCurve
 import CreditDerivativeCSVReader
 import Calibration
 import CDS
+import CalibrationMaster
 
 #------------------------------------------------------------------------------
 
@@ -86,7 +87,6 @@ class CalibrationTests(unittest.TestCase):
 		"""docstring for fname"""
 		HP_calib = self.HP.Calibrate()
 		IHP_calib = self.IHP.Calibrate()
-		print HP_calib[0], IHP_calib[0]
 		
 		self.assertEqual(round(HP_calib[0], 4), round(0.01240234, 4))
 		self.assertEqual(round(IHP_calib[0], 4), round(0.00487254926212, 4))
@@ -95,9 +95,44 @@ class CalibrationTests(unittest.TestCase):
 		
 	
 #------------------------------------------------------------------------------
-		
+
+
 class CalibrationMaster(unittest.TestCase):
-	pass
+	
+	def setUp(self):
+		"""docstring for setUP"""
+		import CalibrationMaster
+		import Calibration
+		
+		HP = Calibration.Calibration(	
+					DiscountCurve 	= DiscountCurve.FlatDiscountCurve(r = 0.00), 
+					CDS				= CDS.HPCreditDefaultSwap,
+					Process			= "HP",
+					Guess			= [0.01],
+					)
+		
+		self.CalibrationMaster = CalibrationMaster.CalibrationMaster( 
+				CreditDerivativeCSVReader.CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
+				HP,
+				)
+				
+		# results =  x.Calibrate(debug = 1, N = 2)
+		# print x.FormatResults(results)
+
+	def testCalibrate(self):
+		"""docstring for testCalibrate"""
+		calibration_results = self.CalibrationMaster.Calibrate(N = 2, debug = 0)
+				
+		self.assertEqual(calibration_results[0][0], '16/03/11')
+		self.assertEqual(calibration_results[1][0], '17/03/11')
+		self.assertEqual(round(calibration_results[0][2], 4), \
+							round(33.686874479088694, 4))
+		self.assertEqual(calibration_results[1][0], '17/03/11')
+		
+		
+		# self.assertEqual( self.CalibrationMaster,)
+		
+
 	
 #------------------------------------------------------------------------------
 
