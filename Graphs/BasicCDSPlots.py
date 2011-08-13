@@ -722,11 +722,13 @@ def ParameterStabilityParameters(acorr = False):
 			static_values = static_parameters[i]
 
 			pylab.subplot(2,2,i)
-			
+			lag = 5
+			usevlines = False
 			if acorr:
 				if AUTOCOLOR:
-					dyn = pylab.acorr(dynamic_values) #, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
-					# stat = pylab.acorr(static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+					dyn = pylab.acorr(dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0], maxlags = lag, usevlines = usevlines)
+					stat = pylab.acorr(static_values, label = "Static", color = AUTOCOLOR_COLORS[1], maxlags = lag, usevlines = usevlines)
+					pylab.legend()
 				else:
 					dyn = pylab.acorr(dates, dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
 					stat = pylab.acorr(dates, static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
