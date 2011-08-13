@@ -661,7 +661,7 @@ def RMSEDensity():
 	
 #------------------------------------------------------------------------------
 
-def ParameterStabilityParameters():
+def ParameterStabilityParameters(acorr = False):
 	"""docstring for ParameterStability"""
 	
 	pylab.rcParams.update(params)
@@ -692,7 +692,7 @@ def ParameterStabilityParameters():
 			
 		return dates, parameters
 
-	def PlotParameters(process):
+	def PlotParameters(process, acorr = False):
 		"""docstring for PlotRMSE"""
 		
 		mapping = {
@@ -723,13 +723,25 @@ def ParameterStabilityParameters():
 
 			pylab.subplot(2,2,i)
 			
-			if AUTOCOLOR:
-				dyn = pylab.plot(dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
-				stat = pylab.plot(static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
-			else:
-				dyn = pylab.plot(dates, dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
-				stat = pylab.plot(dates, static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
-				
+			if acorr:
+				if AUTOCOLOR:
+					dyn = pylab.acorr(dynamic_values) #, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
+					# stat = pylab.acorr(static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+				else:
+					dyn = pylab.acorr(dates, dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
+					stat = pylab.acorr(dates, static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+			
+			else:		
+				if AUTOCOLOR:
+					dyn = pylab.plot(dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
+					stat = pylab.plot(static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+					pylab.legend()
+					
+				else:
+					dyn = pylab.plot(dates, dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
+					stat = pylab.plot(dates, static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
+					pylab.legend()
+					
 			# pylab.title('Stability of $' + param + '$')
 			# pylab .xlabel('Year')
 			pylab.ylabel('$' + param + '$')
@@ -741,7 +753,6 @@ def ParameterStabilityParameters():
 			# 	
 			
 				
-			pylab.legend()
 			
 			
 		# pylab.subplots_adjust(bottom=0.15)
@@ -750,6 +761,10 @@ def ParameterStabilityParameters():
 		pylab.suptitle(process_name, fontsize = 10)
 
 		pdf_file = "../../Diagrams/ParameterStability/" + process + "Parameters.pdf"
+	
+		if acorr:
+			pdf_file = "../../Diagrams/ParameterStability/" + process + "ParametersAutoCorr.pdf"
+			
 		pylab.savefig(pdf_file)
 		# pylab.show()
 
@@ -757,6 +772,6 @@ def ParameterStabilityParameters():
 	
 
 	for process in ['CIR', 'GOU', 'IGOU']:
-		PlotParameters(process)
+		PlotParameters(process, acorr)
 
 	print "Parameter Stability Parameters Completed"
