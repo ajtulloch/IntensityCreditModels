@@ -462,6 +462,10 @@ def LevyProcessPlots():
 	"""docstring for LevyProcessPlots"""
 
 	np.random.seed(50)
+	N = 50
+	dt = 10.0/N
+	xs = arange(0, 10, dt)
+	
 	
 	def ProcessGen(draws):
 		res = [0.0] * N
@@ -485,11 +489,54 @@ def LevyProcessPlots():
 				res.append(x)
 		return res
 	
+	def InverseGaussOU(gamma, a, b, y_0, N):
+		"""docstring for InverseGaussOU"""
 	
-	N = 1000
-	dt = 10.0/N
-	xs = arange(0, 10, dt)
+		# PRV process
+		PRV = stats.poisson.rvs(a * b * dt / 2, size = N)
+		Poisson = ProcessGen(PRV)
+		POI = [int(i) for i in Poisson]
+		# IG Process
+		IVG = InverseGauss(a / 2 * dt, b, N)
+		z_1 = ProcessGen(IVG)
+		
+		# Sum of normals
+		norm_array = [];
+		z_2	= [0.0] * len(POI);
+		for i, n_i in enumerate(POI):
+			if len(norm_array) != n_i:
+				normal = (stats.norm.rvs() ** 2) / b
+				norm_array.append(normal) 
+			z_2[i] = sum(norm_array)
+		
+		# BDLP for IG-OU
+		Z = [sum(a) for a in zip(*(z_1, z_2))]
+		
+		res = [y_0] * N
+		for i in range(len(Z)):
+			res[i] = -gamma * res[i-1] * dt + Z[i]
+		return res
+		
+	def GammaOU(gamma, a, b, y_0, N):
+		"""docstring for GammaOU"""
+		PRV = stats.poisson.rvs(a * gamma * dt, size = N)
+		Poisson = ProcessGen(PRV)
+		POI = [int(i) for i in Poisson]
+		
+		norm_array = [];
+		z	= [0.0] * len(POI);
+		for i, n_i in enumerate(POI):
+			if len(norm_array) != n_i:
+				normal = stats.expon.rvs(b)
+				norm_array.append(normal) 
+			z[i] = sum(norm_array)
+		
+		res = [y_0] * N
+		for i in range(len(z)):
+			res[i] = -gamma * res[i-1] * dt + z[i]
+		return res
 	
+		
 	PRV = stats.poisson.rvs(1.5*dt, size = N)
 	Poisson = ProcessGen(PRV)
 
@@ -499,13 +546,18 @@ def LevyProcessPlots():
 	IVG = InverseGauss(0.2 * dt, 0.1, N)
 	IG = ProcessGen(IVG)
 
+	IGOU = InverseGaussOU(4, 0.20, 5, 0.08, N)
+	
+	GOU = GammaOU(2, 0.20, 18, 0.08, N)
+	
 	pylab.rcParams.update(params)
 	# pylab.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
 	
 	pylab.figure(1)
 	pylab.clf()
 
-	for process in [(Poisson, "Poisson"), (Gamma, "Gamma"), (IG, "IG") ]:
+	# for process in [(Poisson, "Poisson"), (Gamma, "Gamma"), (IG, "IG"), (IGOU, "IG-OU"), (GOU, "G-OU") ]:
+	for process in [ (GOU, "G-OU"), (IGOU, "IG-OU") ]:
 		pylab.figure(1)
 		pylab.clf()
 		pylab.xlabel('Year' )
@@ -723,12 +775,18 @@ def ParameterStabilityParameters(acorr = False):
 
 			pylab.subplot(2,2,i)
 			lag = 5
-			usevlines = False
+			usevlines = True
+			from matplotlib.patches import Rectangle
+			
 			if acorr:
 				if AUTOCOLOR:
 					dyn = pylab.acorr(dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0], maxlags = lag, usevlines = usevlines)
 					stat = pylab.acorr(static_values, label = "Static", color = AUTOCOLOR_COLORS[1], maxlags = lag, usevlines = usevlines)
-					pylab.legend()
+			
+					p = Rectangle((0, 0), 1, 1, fc=AUTOCOLOR_COLORS[0])
+					q = Rectangle((0, 0), 1, 1, fc=AUTOCOLOR_COLORS[1])
+				
+					pylab.legend((p, q), ("Dynamic", "Static"))
 				else:
 					dyn = pylab.acorr(dates, dynamic_values, label = "Dynamic", color = AUTOCOLOR_COLORS[0])
 					stat = pylab.acorr(dates, static_values, label = "Static", color = AUTOCOLOR_COLORS[1])
