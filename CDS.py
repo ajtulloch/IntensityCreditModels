@@ -216,38 +216,38 @@ class IGOUCreditDefaultSwap(CreditDefaultSwap):
 
 if __name__ == '__main__':
 	print "HP"
-	y = HPCreditDefaultSwap(DiscountCurve = FlatDiscountCurve(r = 0.00),  
-							maturity = 2, 
+	y = HPCreditDefaultSwap(DiscountCurve = FlatDiscountCurve(r = 0.00),
+							maturity = 2,
 							)
 	print y.ParSpread(0.018)
 	print y.ContinuousParSpread(0.018)
 	
 	print "IHP"
-	z = IHPCreditDefaultSwap(	DiscountCurve = FlatDiscountCurve(r = 0.00),  
-								maturity = 2,
-								tenors = [1,2,3,5,7,10],  
+	z = IHPCreditDefaultSwap(	DiscountCurve = FlatDiscountCurve(r = 0.00),
+	                            maturity = 2,
+                                tenors = [1,2,3,5,7,10],
 								)
 	print z.ParSpread([0.018, 0.018, 0.018, 0.018, 0.1, 0.2])
 	print z.ContinuousParSpread([ 0.018, 0.018, 0.018, 0.018, 0.1, 0.2])
-
+	
 	print "G-OU"
-	y = GammaOUCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),  
+	y = GammaOUCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),
 								maturity = 2,
 								)
 	
-	print y.ParSpread([ 0.2, 189, 10000, 0.002])		
+	print y.ParSpread([ 0.2, 189, 10000, 0.002])
 	print y.ContinuousParSpread([0.2, 189, 10000, 0.002])
 	
 	print "IG-OU"
-	y = IGOUCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),  
+	y = IGOUCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),
 								maturity = 2,
 								)
 	
-	print y.ParSpread([ 0.3, 0.8, 5, 0.02])		
+	print y.ParSpread([ 0.3, 0.8, 5, 0.02])
 	print y.ContinuousParSpread([ 0.3, 0.8, 5, 0.02])
 	
 	print "CIR"
-	y = CIRCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),  
+	y = CIRCreditDefaultSwap( 	DiscountCurve = FlatDiscountCurve(r = 0.00),
 								maturity = 2,
 								)
 	
