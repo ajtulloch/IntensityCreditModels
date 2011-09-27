@@ -568,6 +568,18 @@ def LevyProcessPlots():
 			plot = pylab.plot(xs, process[0], color = "black")
 		pylab.savefig('../../Diagrams/Sim' + process[1] + '.pdf')
 
+	for process in [ (Poisson, "Poisson") ]:
+		pylab.figure(1)
+		pylab.clf()
+		pylab.xlabel('Year' )
+		pylab.ylabel('Count ($N_t$)' )
+		if AUTOCOLOR:
+			plot = pylab.plot(xs, process[0])
+		else:
+			plot = pylab.plot(xs, process[0], color = "black")
+		pylab.savefig('../../Diagrams/Sim' + process[1] + '.pdf')
+
+
 	print "Process Simulations Completed"
 	# pylab.show()
 
