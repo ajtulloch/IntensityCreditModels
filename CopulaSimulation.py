@@ -4,6 +4,8 @@ from MarketData import *
 from Calibration import *
 from scipy.stats import scoreatpercentile
 from numpy import arange
+import csv
+
 
 #------------------------------------------------------------------------------
 
@@ -51,10 +53,15 @@ def FlatCorrelationMatrix(rho, N):
 
 def SimulatedVaRCurve(cds_class, market_data, copula_class, rho, size, n_simulations):
     """docstring for VaR"""
-    calib = Calibration(    DiscountCurve   = FlatDiscountCurve(r = 0.03), 
+    if cds_class == HPCreditDefaultSwap:
+        guess = [0.01]
+    else:
+        guess = [0.3, 0.8, 5, 0.02]
+        
+    calib = Calibration(    DiscountCurve   = FlatDiscountCurve(r = 0.02), 
                             MarketData      = market_data,
                             CDS             = cds_class,
-                            Guess           = [0.3, 0.8, 5, 0.02],
+                            Guess           = guess,
                             )
     calib.Calibrate()
     calibrated_gamma = calib.calibrated_gamma 
@@ -67,7 +74,7 @@ def SimulatedVaRCurve(cds_class, market_data, copula_class, rho, size, n_simulat
     print "Sim Results"
     print sim_results
     print "Testing", CopSim.VaR(sim_results, 50)
-    var_t = arange(0, 50, 1)
+    var_t = linspace(0, 50, 100)
     f = lambda x: CopSim.VaR(sim_results, x)
     var_v = map(f, var_t)
     return var_v
@@ -81,10 +88,43 @@ if __name__ == '__main__':
                 '10' : '600' 
                 }
     data = MarketData(spreads)
-    res = SimulatedVaRCurve(IGOUCreditDefaultSwap, 
+    
+    
+    hp = SimulatedVaRCurve( HPCreditDefaultSwap, 
                             data, 
                             GaussianCopula, 
-                            0.5, 
-                            50, 
-                            1000)
-    print res
+                            0.2, 
+                            100, 
+                            2000)
+    
+    gou = SimulatedVaRCurve(GammaOUCreditDefaultSwap, 
+                            data, 
+                            GaussianCopula, 
+                            0.2, 
+                            100, 
+                            2000)
+    # print res
+    
+    igou = SimulatedVaRCurve(IGOUCreditDefaultSwap, 
+                            data, 
+                            GaussianCopula, 
+                            0.2, 
+                            100, 
+                            2000)
+    # print res
+    # cir = SimulatedVaRCurve(CIRCreditDefaultSwap, 
+    #                         data, 
+    #                         GaussianCopula, 
+    #                         0.5, 
+    #                         50, 
+    #                         1000)
+    
+    headers = ["HP", "G-OU", "IG-OU"]
+    values = zip(hp, gou, igou)
+    rows_to_write = [headers]
+    rows_to_write.extend(values)
+    
+    filename = "Copulas/GaussianCopula0.2.csv"
+    with open(filename, 'wb') as f:
+        writer = csv.writer(f)
+        writer.writerows(rows_to_write)

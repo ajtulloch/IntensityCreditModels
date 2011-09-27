@@ -5,8 +5,7 @@ from numpy import ones, eye
 import math
 
 #------------------------------------------------------------------------------
-import sys
-sys.path.append("../")
+
 from CDS import *
 from MarketData import *
 from Calibration import *
@@ -57,15 +56,13 @@ class GaussianCopula(CopulaBase):
         Z = multivariate_normal(mean, cov)
         Y = map(norm.cdf, Z)
         T = map(self.Invert, Y)
-        print "Z", Z
-        print "Y", Y
-        print "T", T
+
         return T
         
         
 class StudentTCopula(CopulaBase):
     """docstring for StudentTCopula"""
-    def __init__(self, CDS, cds_parameter, copula_covariance, copula_degree_freedom, size):
+    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 5):
         # super(GaussianCopula, self).__init__()
         self.CDS = CDS
         self.copula_covariance = copula_covariance
@@ -84,18 +81,10 @@ class StudentTCopula(CopulaBase):
         Y = map(norm.cdf, Z)
         X = [math.sqrt(self.dof)/math.sqrt(s) * y for y in Y]
         T = map(self.Invert, Y)
-        
-        print "Z", Z
-        print "Y", Y
-        print "T", T
+
         return T
     
 
-def FlatCorrelationMatrix(rho, N):
-    """docstring for FlatCorrelationMatrix"""
-    return rho * ones([N, N]) + (1 - rho) * eye(N, N)
-
-# print FlatCorrelationMatrix(0.5, 10)
 
 
 #------------------------------------------------------------------------------
