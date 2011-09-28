@@ -16,6 +16,7 @@ from CDS import *
 from MarketData import *
 from pylab import exp as vec_exp
 from Calibration import *
+from CopulaSimulation import *
 
 #------------------------------------------------------------------------------
 AUTOCOLOR = 1
@@ -847,3 +848,82 @@ def ParameterStabilityParameters(acorr = False):
 		PlotParameters(process, acorr)
 
 	print "Parameter Stability Parameters Completed"
+
+def PlotBivariateCopula():
+    """docstring for fname"""
+    spreads = { 'Date' : '17/5/10', 
+                '1' : '350', 
+                '2' : '350', 
+                '5' : '400', 
+                '7' : '450', 
+                '10' : '600' 
+                }
+    data = MarketData(spreads)
+    copula = StudentTCopula
+
+
+    # 
+    # gou = SimulatedDefaultTimes(GammaOUCreditDefaultSwap, 
+    #                         data, 
+    #                         copula, 
+    #                         rho, 
+    #                         100, 
+    #                         2000)
+    # # print res
+    rhos = [0.2, 0.8]
+    default_times = {'HP' : {}, 'IG-OU' : {}}
+    N = 300
+    for rho in rhos:
+        default_times['HP'][rho] = SimulatedDefaultTimes( HPCreditDefaultSwap, 
+                                        data, 
+                                        copula, 
+                                        rho, 
+                                        2, 
+                                        N)
+    
+        default_times['IG-OU'][rho] = SimulatedDefaultTimes(   IGOUCreditDefaultSwap, 
+                                        data, 
+                                        copula, 
+                                        rho, 
+                                        2, 
+                                        N)
+    pylab.clf()
+	
+    pylab.figure(1)
+	
+    for i, process in enumerate(['HP', 'IG-OU']):
+        pylab.clf()
+        
+        for j, rho in enumerate(rhos):
+            pylab.subplot(1, 2, j)
+            defaults = default_times[process][rho]
+            x, y = zip(*defaults)
+            
+            if AUTOCOLOR:
+                pylab.scatter(x, y, s = 2, color = AUTOCOLOR_COLORS[0])
+            
+            
+            pylab.title("$\\rho$ = " + str(rho), fontsize = 6)
+            pylab.xlabel('$' + '\\tau_1' + '$')
+            pylab.ylabel('$' + '\\tau_2' + '$')
+            pylab.xlim([0,30])
+            pylab.ylim([0,30])
+        	
+                		# loc = mpl.dates.MonthLocator(1)
+    		# 		dateFmt = mpl.dates.DateFormatter('%b %y')
+    		# 		pylab.gca().xaxis.set_major_formatter(dateFmt)
+    		# 		#
+    		# 		pylab.gca().xaxis.set_major_locator(loc)
+    		#
+
+            pylab.subplots_adjust(top=0.85)
+            pylab.subplots_adjust(bottom=0.10)
+            pylab.subplots_adjust(wspace=0.4)
+            	
+        pylab.suptitle("Student's $t$ copula with " + process + " marginals", fontsize = 10)
+    
+        pdf_file = "../../Diagrams/Copulas/" + process + "StudentScatterplot.pdf"
+    
+        pylab.savefig(pdf_file)
+	
+PlotBivariateCopula()

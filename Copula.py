@@ -31,7 +31,7 @@ class CopulaBase(object):
         p_default = lambda x: 1 - self.CDS.SurvivalProbability(cds_parameter, x)
         f = lambda x: p_default(x) - y
 
-        tau = brentq(f, 0, 200)
+        tau = brentq(f, 0, 500)
         return tau
 
       
@@ -48,7 +48,9 @@ class GaussianCopula(CopulaBase):
         self.size = size
         assert size == len(copula_parameter)
     
-    
+    def __str__(self):
+        return "GaussianCopula"
+        
     def Simulate(self):
         """docstring for Simulate"""
         mean = [0.0] * self.size
@@ -71,6 +73,9 @@ class StudentTCopula(CopulaBase):
         self.size = size
         assert size == len(copula_covariance)
 
+    def __str__(self):
+        return "StudentTCopula"
+        
     def Simulate(self):
         """docstring for Simulate"""
         mean = [0.0] * self.size

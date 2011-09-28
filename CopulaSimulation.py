@@ -3,7 +3,7 @@ from CDS import *
 from MarketData import *
 from Calibration import *
 from scipy.stats import scoreatpercentile
-from numpy import arange
+from numpy import arange, linspace
 import csv
 
 
@@ -72,14 +72,38 @@ def SimulatedVaRCurve(cds_class, market_data, copula_class, rho, size, n_simulat
     CopSim = CopulaSimulation(copula)
     sim_results = CopSim.Simulation(n_simulations)
     print "Sim Results"
-    print sim_results
+    # print sim_results
     print "Testing", CopSim.VaR(sim_results, 50)
     var_t = linspace(0, 50, 100)
     f = lambda x: CopSim.VaR(sim_results, x)
     var_v = map(f, var_t)
     return var_v
 
-if __name__ == '__main__':
+def SimulatedDefaultTimes(cds_class, market_data, copula_class, rho, size, n_simulations):
+    """docstring for SimulatedDefault"""
+    if cds_class == HPCreditDefaultSwap:
+        guess = [0.01]
+    else:
+        guess = [0.3, 0.8, 5, 0.02]
+        
+    calib = Calibration(    DiscountCurve   = FlatDiscountCurve(r = 0.02), 
+                            MarketData      = market_data,
+                            CDS             = cds_class,
+                            Guess           = guess,
+                            )
+    calib.Calibrate()
+    calibrated_gamma = calib.calibrated_gamma 
+    CDS = cds_class()
+    cov = FlatCorrelationMatrix(rho, size)
+
+    copula = copula_class(CDS, calibrated_gamma, cov, size)
+    CopSim = CopulaSimulation(copula)
+    sim_results = CopSim.Simulation(n_simulations)
+    
+    return sim_results
+    
+def CreateVaRTermStructure(rho, copula):
+    """docstring for F"""
     spreads = { 'Date' : '17/5/10', 
                 '1' : '350', 
                 '2' : '350', 
@@ -88,27 +112,27 @@ if __name__ == '__main__':
                 '10' : '600' 
                 }
     data = MarketData(spreads)
-    
-    
+
+
     hp = SimulatedVaRCurve( HPCreditDefaultSwap, 
                             data, 
-                            GaussianCopula, 
-                            0.2, 
+                            copula, 
+                            rho, 
                             100, 
                             2000)
-    
+
     gou = SimulatedVaRCurve(GammaOUCreditDefaultSwap, 
                             data, 
-                            GaussianCopula, 
-                            0.2, 
+                            copula, 
+                            rho, 
                             100, 
                             2000)
     # print res
-    
+
     igou = SimulatedVaRCurve(IGOUCreditDefaultSwap, 
                             data, 
-                            GaussianCopula, 
-                            0.2, 
+                            copula, 
+                            rho, 
                             100, 
                             2000)
     # print res
@@ -118,13 +142,23 @@ if __name__ == '__main__':
     #                         0.5, 
     #                         50, 
     #                         1000)
-    
+
     headers = ["HP", "G-OU", "IG-OU"]
     values = zip(hp, gou, igou)
     rows_to_write = [headers]
     rows_to_write.extend(values)
     
-    filename = "Copulas/GaussianCopula0.2.csv"
+    print_mapping = {   GaussianCopula : "GaussianCopula",
+                        StudentTCopula : "StudentTCopula"
+                        }
+    
+    filename = "Copulas/" + print_mapping[copula] + str(rho) + ".csv"
     with open(filename, 'wb') as f:
         writer = csv.writer(f)
         writer.writerows(rows_to_write)
+        
+if __name__ == '__main__':
+    for rho in [0.8]:
+        CreateVaRTermStructure(rho, StudentTCopula)
+    
+    
