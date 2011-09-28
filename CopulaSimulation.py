@@ -154,8 +154,9 @@ def CreateVaRTermStructure(rho, copula, n_obligors = 100, n_sims = 1000):
     rows_to_write = [headers]
     rows_to_write.extend(values)
     
-    print_mapping = {   GaussianCopula : "GaussianCopula",
-                        StudentTCopula : "StudentTCopula"
+    print_mapping = {   GaussianCopula  : "GaussianCopula",
+                        StudentTCopula  : "StudentTCopula"
+                        ClaytonCopula   : "ClaytonCopula"
                         }
     
     filename = "Copulas/" + print_mapping[copula] + str(rho) + ".csv"
