@@ -1,11 +1,13 @@
-from Copula import *
-from CDS import *
-from MarketData import *
-from Calibration import *
 from scipy.stats import scoreatpercentile
 from numpy import arange, linspace
 import csv
 
+#------------------------------------------------------------------------------
+
+from Copula import *
+from CDS import *
+from MarketData import *
+from Calibration import *
 
 #------------------------------------------------------------------------------
 
@@ -96,13 +98,16 @@ def SimulatedDefaultTimes(cds_class, market_data, copula_class, rho, size, n_sim
     CDS = cds_class()
     cov = FlatCorrelationMatrix(rho, size)
 
+    if copula_class == ClaytonCopula:
+        cov = rho
+        
     copula = copula_class(CDS, calibrated_gamma, cov, size)
     CopSim = CopulaSimulation(copula)
     sim_results = CopSim.Simulation(n_simulations)
     
     return sim_results
     
-def CreateVaRTermStructure(rho, copula):
+def CreateVaRTermStructure(rho, copula, n_obligors = 100, n_sims = 1000):
     """docstring for F"""
     spreads = { 'Date' : '17/5/10', 
                 '1' : '350', 
@@ -118,33 +123,34 @@ def CreateVaRTermStructure(rho, copula):
                             data, 
                             copula, 
                             rho, 
-                            100, 
-                            2000)
+                            n_obligors, 
+                            n_sims)
 
     gou = SimulatedVaRCurve(GammaOUCreditDefaultSwap, 
                             data, 
                             copula, 
                             rho, 
-                            100, 
-                            2000)
+                            n_obligors, 
+                            n_sims)
     # print res
 
     igou = SimulatedVaRCurve(IGOUCreditDefaultSwap, 
                             data, 
                             copula, 
                             rho, 
-                            100, 
-                            2000)
+                            n_obligors, 
+                            n_sims)
     # print res
-    # cir = SimulatedVaRCurve(CIRCreditDefaultSwap, 
-    #                         data, 
-    #                         GaussianCopula, 
-    #                         0.5, 
-    #                         50, 
-    #                         1000)
+    cir = SimulatedVaRCurve(CIRCreditDefaultSwap, 
+                            data, 
+                            copula, 
+                            rho, 
+                            n_obligors, 
+                            n_sims)
 
-    headers = ["HP", "G-OU", "IG-OU"]
-    values = zip(hp, gou, igou)
+    headers = ["", "HP", "G-OU", "IG-OU", "CIR"]
+    var_t = linspace(0, 50, 100)
+    values = zip(var_t, hp, gou, igou, cir)
     rows_to_write = [headers]
     rows_to_write.extend(values)
     
@@ -158,7 +164,9 @@ def CreateVaRTermStructure(rho, copula):
         writer.writerows(rows_to_write)
         
 if __name__ == '__main__':
-    for rho in [0.8]:
-        CreateVaRTermStructure(rho, StudentTCopula)
-    
+    for rho in [0.2, 0.5, 0.8]:
+       # CreateVaRTermStructure(rho, StudentTCopula)
+       # CreateVaRTermStructure(rho, GaussianCopula)
+       CreateVaRTermStructure(rho, ClaytonCopula)
+       
     

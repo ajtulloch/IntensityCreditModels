@@ -1,4 +1,4 @@
-from scipy.stats import norm, chi2
+from scipy.stats import norm, chi2, uniform, gamma, t
 from scipy.optimize import brentq
 from numpy.random import multivariate_normal
 from numpy import ones, eye
@@ -30,8 +30,11 @@ class CopulaBase(object):
 
         p_default = lambda x: 1 - self.CDS.SurvivalProbability(cds_parameter, x)
         f = lambda x: p_default(x) - y
-
-        tau = brentq(f, 0, 500)
+        
+        try:
+            tau = brentq(f, 0, 500)
+        except:
+            tau = 500
         return tau
 
       
@@ -83,14 +86,49 @@ class StudentTCopula(CopulaBase):
         
         s = chi2.rvs(self.dof)
         Z = multivariate_normal(mean, cov)
-        Y = map(norm.cdf, Z)
-        X = [math.sqrt(self.dof)/math.sqrt(s) * y for y in Y]
+        X = [math.sqrt(self.dof)/math.sqrt(s) * z for z in Z]
+        Y = [t.cdf(x, self.dof) for x in X]
         T = map(self.Invert, Y)
-
+        
         return T
     
+#------------------------------------------------------------------------------
 
+class ArchimedeanCopula(CopulaBase):
+    """docstring for ArchimedeanCopula"""
+    def __init__(self, CDS, cds_parameter, copula_parameter, size):
+        # super(GaussianCopula, self).__init__()
+        self.CDS = CDS
+        self.copula_parameter = copula_parameter
+        self.cds_parameter = cds_parameter
+        self.size = size
+    
+    def Simulate(self):
+        """docstring for Simulate"""
+        V = self.V()
+        Z = uniform.rvs(size = self.size)
+        print "Z", Z
+        X = map(lambda x: -math.log(x) / V, Z)
+        Y = map(self.GHat, X)
+        print Y
+        T = map(self.Invert, Y)
+        
+        return T
+        
+        
+class ClaytonCopula(ArchimedeanCopula):
+    """docstring for ClaytonCopula"""
+    def __init__(self, CDS, cds_parameter, copula_parameter, size):
+        super(ClaytonCopula, self).__init__(CDS, cds_parameter, copula_parameter, size)
 
+    def V(self):
+        theta = self.copula_parameter
+        return gamma.rvs(1.0 / theta)
+    
+    def GHat(self, t):
+        """docstring for GHat"""
+        theta = self.copula_parameter
+        return (1 + t) ** (-1.0 / theta)
 
 #------------------------------------------------------------------------------
 
@@ -120,7 +158,7 @@ if __name__ == '__main__':
 
     copula = GaussianCopula(CDS, calibrated_gamma, [[1, 0.88], [0.88, 1]], 2)
     copula.Simulate()
-    copula = StudentTCopula(CDS, calibrated_gamma, [[1, 0.88], [0.88, 1]], 5, 2)
+    copula = StudentTCopula(CDS, calibrated_gamma, [[1, 0.88], [0.88, 1]], 2)
     copula.Simulate()
 
 
