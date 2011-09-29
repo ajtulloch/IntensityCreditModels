@@ -9,14 +9,16 @@ from pylab import exp as vec_exp
 import csv
 import datetime
 import matplotlib as mpl
+from pylab import exp as vec_exp
+
 
 #------------------------------------------------------------------------------
 sys.path.append("../")
 from CDS import *
 from MarketData import *
-from pylab import exp as vec_exp
 from Calibration import *
 from CopulaSimulation import *
+from Payoff import *
 
 #------------------------------------------------------------------------------
 AUTOCOLOR = 1
@@ -877,7 +879,7 @@ def PlotBivariateCopula():
         # # print res
         rhos = [0.2, 0.8]
         default_times = {'HP' : {}, 'IG-OU' : {}}
-        N = 300
+        N = 1000
         for rho in rhos:
             default_times['HP'][rho] = SimulatedDefaultTimes( HPCreditDefaultSwap, 
                                             data, 
@@ -934,5 +936,80 @@ def PlotBivariateCopula():
     CreateScatters(GaussianCopula)
     CreateScatters(StudentTCopula)
     
+def MonteCarloCorrelationSensitivities():
+    """docstring for MonteCarloCorrelationSensitivities"""
+    def Pricing(data, payoff, cds_class, calibrated_gamma, copula_class, rho, n_obligors, n_sims):
+        """docstring for Pricing"""
+        
+        CDS = cds_class()
+        cov = FlatCorrelationMatrix(rho, n_obligors)
+        copula = copula_class(CDS, calibrated_gamma, cov, n_obligors)
+        CopSim = CopulaSimulation(copula)
+
+
+        MCSim = MonteCarloPricingSim(payoff, CopSim)
+        return MCSim.Price(n_sims)
+    
+    spreads = { 'Date' : '17/5/10', 
+                '1' : '350', 
+                '2' : '350', 
+                '5' : '400', 
+                '7' : '450', 
+                '10' : '600' 
+                }
+    data = MarketData(spreads)
+    # 
+    # print_mapping = {   GaussianCopula : "Gaussian",
+    #                     StudentTCopula : "Student's $t$"
+    #                     }
+  
+    guess = [0.3, 0.8, 5, 0.02]
+    
+    calib = Calibration(DiscountCurve   = FlatDiscountCurve(r = 0.02), 
+                        MarketData      = data,
+                        CDS             = IGOUCreditDefaultSwap,
+                        Guess           = guess,
+                        )
+    calib.Calibrate()
+    
+    calibrated_gamma = calib.calibrated_gamma 
+    payoff = KthToDefault(k = 1, T = 5)
+    payoff = KthToLthTranche(k = 15, l = 100, T = 5)
+    n_obligors = 50
+    n_sims = 100
+    rhos = np.linspace(0, 1, 11)
+    prices = []
+    for rho in rhos:
+        price = Pricing(data, 
+                        payoff,
+                        IGOUCreditDefaultSwap,
+                        calibrated_gamma,
+                        GaussianCopula,
+                        rho,
+                        n_obligors,
+                        n_sims)
+        prices.append(price)
+    
+    pylab.figure(1)
+    pylab.clf()
+    pylab.plot(rhos, prices)
+    pylab.xlabel('$' + '\\rho' + '$')
+    pylab.ylabel('Premium')
+    # pylab.xlim([0,1])
+    # pylab.ylim([0,1])
+
+        		# loc = mpl.dates.MonthLocator(1)
+	# 		dateFmt = mpl.dates.DateFormatter('%b %y')
+	# 		pylab.gca().xaxis.set_major_formatter(dateFmt)
+	# 		#
+	# 		pylab.gca().xaxis.set_major_locator(loc)
+	#
+
 	
-PlotBivariateCopula()
+    # pylab.suptitle(pretty_copula + " copula with " + process + " marginals", fontsize = 10)
+
+    pdf_file = "../../Diagrams/Copulas/KthtoLthTrancheDefaultSensitivity.pdf"
+
+    pylab.savefig(pdf_file)
+ 
+MonteCarloCorrelationSensitivities()

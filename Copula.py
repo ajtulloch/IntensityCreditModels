@@ -64,10 +64,18 @@ class GaussianCopula(CopulaBase):
 
         return T
         
+    def SimulateUniforms(self):
+        """docstring for Simulate"""
+        mean = [0.0] * self.size
+        cov = self.copula_parameter
+        Z = multivariate_normal(mean, cov)
+        Y = map(norm.cdf, Z)
+
+        return Y
         
 class StudentTCopula(CopulaBase):
     """docstring for StudentTCopula"""
-    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 5):
+    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 2):
         # super(GaussianCopula, self).__init__()
         self.CDS = CDS
         self.copula_covariance = copula_covariance
@@ -92,6 +100,18 @@ class StudentTCopula(CopulaBase):
         
         return T
     
+    def SimulateUniforms(self):
+        """docstring for Simulate"""
+        mean = [0.0] * self.size
+        cov = self.copula_covariance
+
+        s = chi2.rvs(self.dof)
+        Z = multivariate_normal(mean, cov)
+        X = [math.sqrt(self.dof)/math.sqrt(s) * z for z in Z]
+        Y = [t.cdf(x, self.dof) for x in X]
+
+        return Y
+    
 #------------------------------------------------------------------------------
 
 class ArchimedeanCopula(CopulaBase):
@@ -114,7 +134,17 @@ class ArchimedeanCopula(CopulaBase):
         T = map(self.Invert, Y)
         
         return T
-        
+    
+    def SimulateUniforms(self):
+        """docstring for Simulate"""
+        V = self.V()
+        Z = uniform.rvs(size = self.size)
+        print "Z", Z
+        X = map(lambda x: -math.log(x) / V, Z)
+        Y = map(self.GHat, X)
+        print Y
+        # T = map(self.Invert, Y)
+        return T    
         
 class ClaytonCopula(ArchimedeanCopula):
     """docstring for ClaytonCopula"""
@@ -138,12 +168,12 @@ if __name__ == '__main__':
     z = MarketData(spreads)
     
     
-    IGOU = Calibration(   DiscountCurve   = FlatDiscountCurve(r = 0.03), 
-                      MarketData      = z,
-                      CDS             = IGOUCreditDefaultSwap,
-                      Process         = "IG-OU",
-                      Guess           = [0.3, 0.8, 5, 0.02],
-                      )
+    IGOU = Calibration( DiscountCurve   = FlatDiscountCurve(r = 0.03), 
+                        MarketData      = z,
+                        CDS             = IGOUCreditDefaultSwap,
+                        Process         = "IG-OU",
+                        Guess           = [0.3, 0.8, 5, 0.02],
+                        )
     
     IGOU.Calibrate()
 

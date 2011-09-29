@@ -16,16 +16,20 @@ class CopulaSimulation(object):
     def __init__(self, copula):
         self.copula = copula
         
-    def Simulation(self, N):
+    def Simulation(self, N, uniforms = False):
         """docstring for Simulation"""
         results = []
         for i in range(N):
-            taus = self.copula.Simulate()
+            if uniforms:
+                taus = self.copula.SimulateUniforms()
+            else:
+                taus = self.copula.Simulate()
             results.append(taus)
             # print taus
             
         return results
         
+    
     def PortfolioLoss(self, simulation_results, t):
         """docstring for PortfolioLoss"""
         losses = []
@@ -81,7 +85,7 @@ def SimulatedVaRCurve(cds_class, market_data, copula_class, rho, size, n_simulat
     var_v = map(f, var_t)
     return var_v
 
-def SimulatedDefaultTimes(cds_class, market_data, copula_class, rho, size, n_simulations):
+def SimulatedDefaultTimes(cds_class, market_data, copula_class, rho, size, n_simulations, uniforms = False):
     """docstring for SimulatedDefault"""
     if cds_class == HPCreditDefaultSwap:
         guess = [0.01]
@@ -103,7 +107,7 @@ def SimulatedDefaultTimes(cds_class, market_data, copula_class, rho, size, n_sim
         
     copula = copula_class(CDS, calibrated_gamma, cov, size)
     CopSim = CopulaSimulation(copula)
-    sim_results = CopSim.Simulation(n_simulations)
+    sim_results = CopSim.Simulation(n_simulations, uniforms)
     
     return sim_results
     
@@ -155,8 +159,8 @@ def CreateVaRTermStructure(rho, copula, n_obligors = 100, n_sims = 1000):
     rows_to_write.extend(values)
     
     print_mapping = {   GaussianCopula  : "GaussianCopula",
-                        StudentTCopula  : "StudentTCopula"
-                        ClaytonCopula   : "ClaytonCopula"
+                        StudentTCopula  : "StudentTCopula",
+                        ClaytonCopula   : "ClaytonCopula",
                         }
     
     filename = "Copulas/" + print_mapping[copula] + str(rho) + ".csv"
