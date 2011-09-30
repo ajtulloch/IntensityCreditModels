@@ -30,6 +30,15 @@ class KthToDefault(Payoff):
         super(KthToDefault, self).__init__(DiscountCurve)
         self.T = T
         self.k = k
+     
+    def __str__(self):
+        """docstring for __str__"""
+        if self.k == 1:
+            return "1st to Default"
+        elif self.k == 2:
+            return "2nd to Default"
+        else:
+            return str(self.k) + "th to Default"   
         
     def Payoff(self, taus):
         """docstring for Payoff"""
@@ -53,7 +62,11 @@ class KthToLthTranche(Payoff):
         self.k = k
         self.l = l
         assert k < l
-        
+       
+    def __str__(self):
+        """docstring for __str__"""
+        return str(self.k) + "to" + str(self.l) + "Tranche"
+
     def Payoff(self, taus):
         """docstring for Payoff"""
         defaults_before_t = sum(map(lambda x: x < self.T, taus))

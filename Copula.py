@@ -75,7 +75,7 @@ class GaussianCopula(CopulaBase):
         
 class StudentTCopula(CopulaBase):
     """docstring for StudentTCopula"""
-    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 2):
+    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 1):
         # super(GaussianCopula, self).__init__()
         self.CDS = CDS
         self.copula_covariance = copula_covariance

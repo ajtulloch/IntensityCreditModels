@@ -80,7 +80,7 @@ def SimulatedVaRCurve(cds_class, market_data, copula_class, rho, size, n_simulat
     print "Sim Results"
     # print sim_results
     print "Testing", CopSim.VaR(sim_results, 50)
-    var_t = linspace(0, 50, 100)
+    var_t = linspace(0, 50, 101)
     f = lambda x: CopSim.VaR(sim_results, x)
     var_v = map(f, var_t)
     return var_v
@@ -153,7 +153,7 @@ def CreateVaRTermStructure(rho, copula, n_obligors = 100, n_sims = 1000):
                             n_sims)
 
     headers = ["", "HP", "G-OU", "IG-OU", "CIR"]
-    var_t = linspace(0, 50, 100)
+    var_t = linspace(0, 50, 101)
     values = zip(var_t, hp, gou, igou, cir)
     rows_to_write = [headers]
     rows_to_write.extend(values)
@@ -170,8 +170,8 @@ def CreateVaRTermStructure(rho, copula, n_obligors = 100, n_sims = 1000):
         
 if __name__ == '__main__':
     for rho in [0.2, 0.5, 0.8]:
-       # CreateVaRTermStructure(rho, StudentTCopula)
-       # CreateVaRTermStructure(rho, GaussianCopula)
-       CreateVaRTermStructure(rho, ClaytonCopula)
+       CreateVaRTermStructure(rho, StudentTCopula)
+       CreateVaRTermStructure(rho, GaussianCopula)
+       # CreateVaRTermStructure(rho, ClaytonCopula)
        
     

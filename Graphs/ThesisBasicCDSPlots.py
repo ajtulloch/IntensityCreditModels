@@ -10,7 +10,8 @@ import csv
 import datetime
 import matplotlib as mpl
 from pylab import exp as vec_exp
-
+import string
+import re
 
 #------------------------------------------------------------------------------
 sys.path.append("../")
@@ -44,7 +45,7 @@ params = {'backend': 'pdf',
 		  # 'axes.color_cycle'    : ("#348ABD", "#7A68A6", "A60628", "467821", "CF4457", "188487", "E24A33"),
 		  'figure.subplot.bottom': 0.12,
 		  'font.family' : 'serif',
-		  'font.serif' : ['Minion Pro']
+          # 'font.serif' : ['Minion Pro']
 			}
 
 pylab.rcParams.update(params)
@@ -851,7 +852,7 @@ def ParameterStabilityParameters(acorr = False):
 
 	print "Parameter Stability Parameters Completed"
 
-def PlotBivariateCopula():
+def PlotBivariateCopula(uniforms = False, n_sim = 500):
     """docstring for fname"""
     spreads = { 'Date' : '17/5/10', 
                 '1' : '350', 
@@ -862,8 +863,8 @@ def PlotBivariateCopula():
                 }
     data = MarketData(spreads)
     
-    print_mapping = {   GaussianCopula : "Gaussian",
-                        StudentTCopula : "Student's $t$"
+    print_mapping = {   GaussianCopula : "Gaussian Copula",
+                        StudentTCopula : "Student's $t$ Copula"
                         }
     
     def CreateScatters(copula):
@@ -878,41 +879,64 @@ def PlotBivariateCopula():
         #                         2000)
         # # print res
         rhos = [0.2, 0.8]
-        default_times = {'HP' : {}, 'IG-OU' : {}}
-        N = 1000
+        default_times = {'HP' : {}, 'IG-OU' : {}, 'Gamma-OU': {}}
+        N = n_sim
         for rho in rhos:
             default_times['HP'][rho] = SimulatedDefaultTimes( HPCreditDefaultSwap, 
                                             data, 
                                             copula, 
                                             rho, 
                                             2, 
-                                            N)
+                                            N,
+                                            uniforms = uniforms)
     
-            default_times['IG-OU'][rho] = SimulatedDefaultTimes(   IGOUCreditDefaultSwap, 
+            default_times['IG-OU'][rho] = SimulatedDefaultTimes(IGOUCreditDefaultSwap, 
                                             data, 
                                             copula, 
                                             rho, 
                                             2, 
-                                            N)
+                                            N,
+                                            uniforms = uniforms)
+
+            default_times['Gamma-OU'][rho] = SimulatedDefaultTimes(GammaOUCreditDefaultSwap, 
+                                            data, 
+                                            copula, 
+                                            rho, 
+                                            2, 
+                                            N,
+                                            uniforms = uniforms)
+
+            
         pylab.clf()
 	
         pylab.figure(1)
-	
-        for i, process in enumerate(['HP', 'IG-OU']):
+	    
+        for i, process in enumerate(default_times.keys()):
             pylab.clf()
-        
+    
             for j, rho in enumerate(rhos):
-                pylab.subplot(1, 2, j)
+                pylab.subplot(1, 2, j+1)
                 defaults = default_times[process][rho]
                 x, y = zip(*defaults)
             
                 if AUTOCOLOR:
-                    pylab.scatter(x, y, s = 2, color = AUTOCOLOR_COLORS[0])
-            
+                    pylab.scatter(x, y, s = 1, color = AUTOCOLOR_COLORS[j])
             
                 pylab.title("$\\rho$ = " + str(rho), fontsize = 8)
-                pylab.xlabel('$' + '\\tau_1' + '$')
-                pylab.ylabel('$' + '\\tau_2' + '$')
+                if uniforms:
+                    label = ["u_1", "u_2" ]
+                    title = pretty_copula
+                    pylab.xlim([0,1])
+                    pylab.ylim([0,1])
+                else:
+                    label = ["\\tau_1", "\\tau_2"]
+                    title = pretty_copula + " with " + process + " marginals"
+                    tmax = 60
+                    pylab.xlim([0, tmax])
+                    pylab.ylim([0, tmax])
+                    
+                pylab.xlabel('$' + label[0] + '$')
+                pylab.ylabel('$' + label[1] + '$')
                 # pylab.xlim([0,50])
                 # pylab.ylim([0,50])
         	
@@ -927,9 +951,9 @@ def PlotBivariateCopula():
                 pylab.subplots_adjust(bottom=0.10)
                 pylab.subplots_adjust(wspace=0.4)
             	
-            pylab.suptitle(pretty_copula + " copula with " + process + " marginals", fontsize = 10)
-    
-            pdf_file = "../../Diagrams/Copulas/" + process + pretty_copula +  "Scatterplot.pdf"
+            pylab.suptitle(title, fontsize = 10)
+            file_title = re.sub("[\s'$]", "", title)
+            pdf_file = "../../Diagrams/Copulas/" + file_title + "Scatterplot.pdf"
     
             pylab.savefig(pdf_file)
 	
@@ -938,7 +962,7 @@ def PlotBivariateCopula():
     
 def MonteCarloCorrelationSensitivities():
     """docstring for MonteCarloCorrelationSensitivities"""
-    def Pricing(data, payoff, cds_class, calibrated_gamma, copula_class, rho, n_obligors, n_sims):
+    def PricePayoff(data, payoff, cds_class, calibrated_gamma, copula_class, rho, n_obligors, n_sims):
         """docstring for Pricing"""
         
         CDS = cds_class()
@@ -950,53 +974,86 @@ def MonteCarloCorrelationSensitivities():
         MCSim = MonteCarloPricingSim(payoff, CopSim)
         return MCSim.Price(n_sims)
     
-    spreads = { 'Date' : '17/5/10', 
-                '1' : '350', 
-                '2' : '350', 
-                '5' : '400', 
-                '7' : '450', 
-                '10' : '600' 
-                }
-    data = MarketData(spreads)
-    # 
-    # print_mapping = {   GaussianCopula : "Gaussian",
-    #                     StudentTCopula : "Student's $t$"
-    #                     }
-  
-    guess = [0.3, 0.8, 5, 0.02]
+    def SetupPayoffCopula(payoff, cds_class, copula_class, rhos, n_sims, n_obligors):
+        """docstring for fname"""
+        
+        spreads = { 'Date' : '17/5/10', 
+                    '1' : '350', 
+                    '2' : '350', 
+                    '5' : '400', 
+                    '7' : '450', 
+                    '10' : '600' 
+                    }
+        data = MarketData(spreads)
+        
+        if cds_class == HPCreditDefaultSwap:
+            guess = [0.01]
+        else:
+            guess = [0.3, 0.8, 5, 0.02]
+        
+        calib = Calibration(DiscountCurve   = FlatDiscountCurve(r = 0.02), 
+                            MarketData      = data,
+                            CDS             = cds_class,
+                            Guess           = guess,
+                            )
+        calib.Calibrate()
+        calibrated_gamma = calib.calibrated_gamma 
+        prices = []
+        for rho in rhos:
+            price = PricePayoff(data, 
+                                payoff,
+                                IGOUCreditDefaultSwap,
+                                calibrated_gamma,
+                                GaussianCopula,
+                                rho,
+                                n_obligors,
+                                n_sims)
+            prices.append(price)
+        return prices
     
-    calib = Calibration(DiscountCurve   = FlatDiscountCurve(r = 0.02), 
-                        MarketData      = data,
-                        CDS             = IGOUCreditDefaultSwap,
-                        Guess           = guess,
-                        )
-    calib.Calibrate()
     
-    calibrated_gamma = calib.calibrated_gamma 
-    payoff = KthToDefault(k = 1, T = 5)
-    payoff = KthToLthTranche(k = 15, l = 100, T = 5)
-    n_obligors = 50
-    n_sims = 100
-    rhos = np.linspace(0, 1, 11)
-    prices = []
-    for rho in rhos:
-        price = Pricing(data, 
-                        payoff,
-                        IGOUCreditDefaultSwap,
-                        calibrated_gamma,
-                        GaussianCopula,
-                        rho,
-                        n_obligors,
-                        n_sims)
-        prices.append(price)
     
-    pylab.figure(1)
-    pylab.clf()
-    pylab.plot(rhos, prices)
-    pylab.xlabel('$' + '\\rho' + '$')
-    pylab.ylabel('Premium')
-    # pylab.xlim([0,1])
-    # pylab.ylim([0,1])
+    print_mapping = {   GaussianCopula : "Gaussian",
+                        StudentTCopula : "Student's $t$"
+                        }
+    cds_mapping = {     HPCreditDefaultSwap : "HP", 
+                        GammaOUCreditDefaultSwap : "Gamma-OU", 
+                        IGOUCreditDefaultSwap: "Inverse Gaussian-OU"
+                        }
+    # Pairs of (payoff, n_obligors, n_sims)
+    payoff_specification = [(KthToDefault(k=1, T=5), 10, 500), 
+                            (KthToDefault(k=5, T=5), 10, 500),
+                            (KthToDefault(k=10, T=5), 10, 500),    
+                            # (KthToLthTranche(k = 10, l = 100, T=5), 20, 100),
+                            ]
+    rhos = np.linspace(0,1,11)
+    
+    for cds_class in [GammaOUCreditDefaultSwap, IGOUCreditDefaultSwap]:
+        price_array = []
+        for copula_class in print_mapping.keys():
+            for (payoff, n_obligors, n_sims) in payoff_specification:
+                prices = SetupPayoffCopula(payoff, cds_class, copula_class, rhos, n_sims, n_obligors)
+                name = str(payoff) + ", " + print_mapping[copula_class]
+                price_array.append((prices, name))
+        
+        pylab.figure(1)
+        pylab.clf()
+        for (prices, name) in price_array:
+            pylab.plot(rhos, prices, label = name)
+        pylab.xlabel('$' + '\\rho' + '$')
+        pylab.ylabel('Premium')
+        title = cds_mapping[cds_class]
+        pylab.xlim([0,1])
+        pylab.ylim([0,1])  
+        pylab.suptitle(title, fontsize = 10)
+        
+        pylab.legend()    
+        file_title = re.sub("[\s'$-]", "",  cds_mapping[cds_class] + str(payoff) )
+                  
+        pdf_file = "../../Diagrams/Copulas/" + file_title + ".pdf"
+        print pdf_file
+        pylab.savefig(pdf_file)
+        
 
         		# loc = mpl.dates.MonthLocator(1)
 	# 		dateFmt = mpl.dates.DateFormatter('%b %y')
@@ -1007,9 +1064,7 @@ def MonteCarloCorrelationSensitivities():
 
 	
     # pylab.suptitle(pretty_copula + " copula with " + process + " marginals", fontsize = 10)
+PlotBivariateCopula(uniforms = False, n_sim = 1000)
+# PlotBivariateCopula(uniforms = True, n_sim = 2000)
 
-    pdf_file = "../../Diagrams/Copulas/KthtoLthTrancheDefaultSensitivity.pdf"
-
-    pylab.savefig(pdf_file)
- 
-MonteCarloCorrelationSensitivities()
+# MonteCarloCorrelationSensitivities()
