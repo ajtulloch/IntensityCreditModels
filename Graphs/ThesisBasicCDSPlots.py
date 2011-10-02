@@ -33,13 +33,13 @@ fig_width = fig_width_pt*inches_per_pt  # width in inches
 fig_height = fig_width*golden_mean      # height in inches
 fig_size =  [fig_width, fig_height]
 params = {'backend': 'pdf',
-          'axes.labelsize':  8,
-          'text.fontsize':   8,
-		  'suptitle.fontsize': 8,
-          'legend.fontsize': 8,
-          'xtick.labelsize': 8,
-          'ytick.labelsize': 8,
-		  'title.fontsize' : 8,
+          'axes.labelsize':  10,
+          'text.fontsize':   10,
+		  'suptitle.fontsize': 10,
+          'legend.fontsize': 10,
+          'xtick.labelsize': 10,
+          'ytick.labelsize': 10,
+		  'title.fontsize' : 10,
           'text.usetex'		: True,
           'figure.figsize': fig_size,
 		  # 'axes.color_cycle'    : ("#348ABD", "#7A68A6", "A60628", "467821", "CF4457", "188487", "E24A33"),
@@ -92,7 +92,7 @@ def CDSCashflows( barcolour = "grey"):
 
 #------------------------------------------------------------------------------
 
-def CDSIssuance( barcolour = "grey", fig_width = 469.7549 ):
+def CDSIssuance( barcolour = "grey" ):
 	"""docstring for CDSIssuance"""
 
 	
@@ -103,21 +103,21 @@ def CDSIssuance( barcolour = "grey", fig_width = 469.7549 ):
 	CDS_Issuance = "6395.744	10211.378	13908.285	20352.307	28650.265	42580.546	58243.721	57402.758	41882.684	36046.236	32692.694	30260.93"
 	Times = "Dec.2004	Jun.2005	Dec.2005	Jun.2006	Dec.2006	Jun.2007	Dec.2007	Jun.2008	Dec.2008	Jun.2009	Dec.2009	Jun.2010"
 	Time_list = Times.split()
-	labels = []
-	for t in Time_list:
-		if t[0:3] == "Dec":
-			labels.append( "H2 " + t[6:])
-		else:
-			labels.append( "H1 " + t[6:])
-	
-	
-	CDS = [ float(i)/1000 for i in CDS_Issuance.split()]
-	CDO = [ float(i)/1000 for i in CDO_Issuance.split()]
-	
+    # labels = []
+	labels = [t[4:] for i, t in enumerate(Time_list) if i % 2 == 0]
+    # for t in Time_list:
+    #   if t[0:3] == "Dec":
+    #       labels.append( "H2 " + t[6:])
+    #   else:
+    #       labels.append( "H1 " + t[6:])
+	CDS_t = [ float(i)/1000 for i in CDS_Issuance.split()]
+	CDO_t = [ float(i)/1000 for i in CDO_Issuance.split()]
+	CDS = [CDS_t[i] + CDS_t[i+1] for i, v in enumerate(CDS_t) if i % 2 == 0]
+	CDO = [CDO_t[i] + CDO_t[i+1] for i, v in enumerate(CDO_t) if i % 2 == 0]	
 	
 	N = len(CDS)
 	ind = np.arange(N)
-	width = 0.35
+	width = 0.3
 	
 	# print labels
 	
@@ -286,7 +286,7 @@ def ParSpreadAndSurvivalProbabilities():
 	market_x = [k for k,v in z.Data()]
 	market_y = [v for k,v in z.Data()]
 
-	HP = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
+	HP = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
 								MarketData 		= z,
 								CDS				= HPCreditDefaultSwap,
 								Process			= "HP",
@@ -294,26 +294,26 @@ def ParSpreadAndSurvivalProbabilities():
 								)
 
 
-	IHP = InhomogenousPoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
+	IHP = InhomogenousCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
 											MarketData 		= z,
 											# Process			= "IHP"
 											)
 
-	CIR = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
+	CIR = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
 								MarketData 		= z,
 								CDS 			= CIRCreditDefaultSwap,
 								Process			= "CIR",
 								Guess			= [0.1, 0.3, 0.2, 0.02],
 								)
 
-	GOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
+	GOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
 								MarketData 		= z,
 								CDS				= GammaOUCreditDefaultSwap,
 								Process			= "G-OU",
 								Guess			= [0.2, 189, 10000, 0.002],
 								)
 
-	IGOU = PoissonCalibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
+	IGOU = Calibration(	DiscountCurve 	= FlatDiscountCurve(r = 0.03), 
 								MarketData 		= z,
 								CDS 			= IGOUCreditDefaultSwap,
 								Process			= "IG-OU",
@@ -791,7 +791,7 @@ def ParameterStabilityParameters(acorr = False):
 
 			pylab.subplot(2,2,i)
 			lag = 5
-			usevlines = True
+			usevlines = False
 			from matplotlib.patches import Rectangle
 			
 			if acorr:
@@ -801,6 +801,7 @@ def ParameterStabilityParameters(acorr = False):
 			
 					p = Rectangle((0, 0), 1, 1, fc=AUTOCOLOR_COLORS[0])
 					q = Rectangle((0, 0), 1, 1, fc=AUTOCOLOR_COLORS[1])
+					pylab.ylim([0,1])
 				
 					pylab.legend((p, q), ("Dynamic", "Static"))
 				else:
@@ -1055,6 +1056,106 @@ def MonteCarloCorrelationSensitivities():
         pylab.savefig(pdf_file)
         
 
+def MonteCarloVaR():
+    """Create CSV and VaR Charts for Various Securities Tranches"""
+    def VarAndPricePayoff(data, payoff, cds_class, calibrated_gamma, copula_class, rho, n_obligors, n_sims):
+        """docstring for Pricing"""
+        
+        CDS = cds_class()
+        cov = FlatCorrelationMatrix(rho, n_obligors)
+        copula = copula_class(CDS, calibrated_gamma, cov, n_obligors)
+        CopSim = CopulaSimulation(copula)
+
+        MCSim = MonteCarloPricingSim(payoff, CopSim)
+        return MCSim.VaR(n_sims)
+    
+    def SetupPayoffCopula(payoff, cds_class, copula_class, rhos, n_sims, n_obligors):
+        """docstring for fname"""
+        
+        spreads = { 'Date' : '17/5/10', 
+                    '1' : '350', 
+                    '2' : '350', 
+                    '5' : '400', 
+                    '7' : '450', 
+                    '10' : '600' 
+                    }
+        data = MarketData(spreads)
+        
+        if cds_class == HPCreditDefaultSwap:
+            guess = [0.01]
+        else:
+            guess = [0.3, 0.8, 5, 0.02]
+        
+        calib = Calibration(DiscountCurve   = FlatDiscountCurve(r = 0.02), 
+                            MarketData      = data,
+                            CDS             = cds_class,
+                            Guess           = guess,
+                            )
+        calib.Calibrate()
+        calibrated_gamma = calib.calibrated_gamma 
+        prices = []
+        value_at_risks = []
+        for rho in rhos:
+            price, var = VarAndPricePayoff(data, 
+                                payoff,
+                                IGOUCreditDefaultSwap,
+                                calibrated_gamma,
+                                GaussianCopula,
+                                rho,
+                                n_obligors,
+                                n_sims)
+            prices.append(price)
+            value_at_risks.append(price)
+            
+        return (prices, value_at_risks) 
+
+    print_mapping = {   GaussianCopula : "Gaussian",
+                        StudentTCopula : "Student's $t$"
+                        }
+    cds_mapping = {     HPCreditDefaultSwap : "HP", 
+                        GammaOUCreditDefaultSwap : "Gamma-OU", 
+                        IGOUCreditDefaultSwap: "Inverse Gaussian-OU"
+                        }
+    # Pairs of (payoff, n_obligors, n_sims)
+    n_obligs = 100
+    n_simus = 500
+    payoff_specification = [(KthToLthTranche(k=0, l=3, n = n_obligs, T=5), n_obligs, n_simus), 
+                            (KthToLthTranche(k=10, l=15, n = n_obligs, T=5), n_obligs, n_simus),    
+                            (KthToLthTranche(k=30, l=100, n = n_obligs, T=5), n_obligs, n_simus),
+                            # (KthToLthTranche(k = 10, l = 100, T=5), 20, 100),
+                            ]
+    rhos = np.linspace(0,1,5)
+    
+    for cds_class in [GammaOUCreditDefaultSwap, IGOUCreditDefaultSwap]:
+        var_array = []
+        for copula_class in print_mapping.keys():
+            for (payoff, n_obligors, n_sims) in payoff_specification:
+                prices, value_at_risks = SetupPayoffCopula(payoff, cds_class, copula_class, rhos, n_sims, n_obligors)
+                name = str(payoff) + ", " + print_mapping[copula_class]
+                var_array.append((value_at_risks, name))
+                print name
+                print value_at_risks
+        
+        pylab.figure(1)
+        pylab.clf()
+        print "DOING CDS CLASS PLOTS"
+        for (var, name) in var_array:
+            pylab.plot(rhos, var, label = name)
+        pylab.xlabel('$' + '\\rho' + '$')
+        pylab.ylabel('VaR')
+        title = cds_mapping[cds_class]
+        pylab.xlim([0,1])
+        pylab.ylim([0,1])  
+        pylab.suptitle(title, fontsize = 10)
+        
+        pylab.legend()    
+        file_title = re.sub("[\\%\s'$-]", "",  cds_mapping[cds_class] + str(payoff) )
+                  
+        pdf_file = "../../Diagrams/Copulas/" + file_title + ".pdf"
+        print pdf_file
+        pylab.savefig(pdf_file)
+
+
         		# loc = mpl.dates.MonthLocator(1)
 	# 		dateFmt = mpl.dates.DateFormatter('%b %y')
 	# 		pylab.gca().xaxis.set_major_formatter(dateFmt)
@@ -1064,7 +1165,7 @@ def MonteCarloCorrelationSensitivities():
 
 	
     # pylab.suptitle(pretty_copula + " copula with " + process + " marginals", fontsize = 10)
-PlotBivariateCopula(uniforms = False, n_sim = 1000)
+# PlotBivariateCopula(uniforms = False, n_sim = 1000)
 # PlotBivariateCopula(uniforms = True, n_sim = 2000)
-
+# MonteCarloVaR()
 # MonteCarloCorrelationSensitivities()

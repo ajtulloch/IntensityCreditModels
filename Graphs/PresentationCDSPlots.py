@@ -39,7 +39,7 @@ params = {'backend': 'pdf',
           'text.usetex'		: False,
           'figure.figsize': fig_size,
 		  # 'axes.color_cycle'    : ("#348ABD", "#7A68A6", "A60628", "467821", "CF4457", "188487", "E24A33"),
-		  'figure.subplot.bottom': 0.12,
+		  'figure.subplot.bottom': 0.08,
 		  'font.family' : 'sans-serif',
 		  'font.sans-serif' : ['Myriad Pro']
 			}

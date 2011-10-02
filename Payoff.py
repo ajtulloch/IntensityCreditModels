@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import scoreatpercentile
 
 #------------------------------------------------------------------------------
 
@@ -56,16 +57,19 @@ class KthToDefault(Payoff):
 class KthToLthTranche(Payoff):
     """Pays off 0 if less than k defaults occur, pays l-k if more than l defaults
     occur, and pays (x-k) if k <= x < l defaults occur"""
-    def __init__(self, k, l, T, DiscountCurve = FlatDiscountCurve(r=0.00)):
+    def __init__(self, k, l, n, T, DiscountCurve = FlatDiscountCurve(r=0.00)):
         super(KthToLthTranche, self).__init__(DiscountCurve)
         self.T = T
         self.k = k
         self.l = l
+        self.n = n
         assert k < l
-       
+
     def __str__(self):
         """docstring for __str__"""
-        return str(self.k) + "to" + str(self.l) + "Tranche"
+        lower_percent = int(float(self.k) / self.n * 100)
+        upper_percent = int(float(self.l) / self.n * 100)
+        return str(lower_percent) + "\%-" + str(upper_percent) + "\%"
 
     def Payoff(self, taus):
         """docstring for Payoff"""
@@ -76,7 +80,7 @@ class KthToLthTranche(Payoff):
             value = 0
         else:
             value = defaults_before_t - self.k
-        return float(value) / len(taus)
+        return float(value) / (self.l - self.k)
      
 #------------------------------------------------------------------------------
 
@@ -95,6 +99,15 @@ class MonteCarloPricingSim(object):
         # print payoffs
         price = float(sum(payoffs)) / n_sim
         return price
+        
+    def VaR(self, n_sim, percentile = 0.95):
+        """docstring for VaR"""
+        taus = self.copula_simulation.Simulation(n_sim)
+        payoffs = map(lambda x: self.payoff.Payoff(x), taus)
+        price = float(sum(payoffs)) / n_sim
+        var = scoreatpercentile(payoffs, percentile)
+        return (price, var)
+        
         
     def AdjustCorrelation(self, new_rho):
         """docstring for AdjustCorrelation"""
@@ -137,7 +150,7 @@ if __name__ == '__main__':
     C = KthToDefault(k = 1, T = 10)
     D = KthToLthTranche(k=4, l = 6, T = 10)
 
-    Y = MonteCarloPricingSim(C, CopSim)
+    # Y = MonteCarloPricingSim(C, CopSim)
     print Y.Price(10000)
     Y.AdjustCorrelation(0.8)
     print Y.Price(10000)
