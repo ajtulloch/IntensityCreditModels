@@ -196,8 +196,3 @@ if __name__ == '__main__':
     copula.Simulate()
     copula = StudentTCopula(CDS, calibrated_gamma, [[1, 0.88], [0.88, 1]], 2)
     copula.Simulate()
-
-
-    
-
-        
