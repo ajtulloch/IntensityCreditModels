@@ -75,7 +75,7 @@ class GaussianCopula(CopulaBase):
         
 class StudentTCopula(CopulaBase):
     """docstring for StudentTCopula"""
-    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 1):
+    def __init__(self, CDS, cds_parameter, copula_covariance, size, copula_degree_freedom = 2):
         # super(GaussianCopula, self).__init__()
         self.CDS = CDS
         self.copula_covariance = copula_covariance
@@ -164,7 +164,13 @@ class ClaytonCopula(ArchimedeanCopula):
 
 if __name__ == '__main__':
 
-    spreads = {'Date' : '17/5/10', '1' : '350', '2' : '350', '5' : '400', '7' : '450', '10' : '600' }
+    spreads = { 'Date'  : '17/5/10', 
+                '1'     : '350',
+                '2'     : '350',
+                '5'     : '400',
+                '7'     : '450', 
+                '10'    : '600', 
+                }
     z = MarketData(spreads)
     
     

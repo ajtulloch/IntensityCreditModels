@@ -1022,21 +1022,22 @@ def MonteCarloCorrelationSensitivities():
                         IGOUCreditDefaultSwap: "Inverse Gaussian-OU"
                         }
     # Pairs of (payoff, n_obligors, n_sims)
-    payoff_specification = [(KthToDefault(k=1, T=5), 10, 500), 
-                            (KthToDefault(k=5, T=5), 10, 500),
-                            (KthToDefault(k=10, T=5), 10, 500),    
+    payoff_specification = [(KthToDefault(k=1, T=5), 5, 5000), 
+                            (KthToDefault(k=2, T=5), 5, 5000),
+                            (KthToDefault(k=5, T=5), 5, 5000),    
                             # (KthToLthTranche(k = 10, l = 100, T=5), 20, 100),
                             ]
-    rhos = np.linspace(0,1,11)
+    rhos = np.linspace(0,0.2,3)
     
     for cds_class in [GammaOUCreditDefaultSwap, IGOUCreditDefaultSwap]:
         price_array = []
         for copula_class in print_mapping.keys():
             for (payoff, n_obligors, n_sims) in payoff_specification:
                 prices = SetupPayoffCopula(payoff, cds_class, copula_class, rhos, n_sims, n_obligors)
-                name = str(payoff) + ", " + print_mapping[copula_class]
+                name = str(payoff)[:3] + ", " + print_mapping[copula_class]
                 price_array.append((prices, name))
-        
+                print name
+                
         pylab.figure(1)
         pylab.clf()
         for (prices, name) in price_array:
