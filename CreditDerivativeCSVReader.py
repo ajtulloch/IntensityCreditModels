@@ -64,3 +64,5 @@ class CreditDerivativeCSVReader(object):
 if __name__ == '__main__':
 	Y = CreditDerivativeCSVReader( "../Data/CDX.csv" )
 	print Y.TimeSlice()
+	Y = CreditDerivativeCSVReader( "../Data/GE.csv" )
+	print Y.TimeSlice()
