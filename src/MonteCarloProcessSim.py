@@ -68,13 +68,13 @@ class IGOUSim(MonteCarloBase):
     
         def ProcessGen(draws):
     
-        	res = [0.0] * N
+            res = [0.0] * N
     
-        	for i in range(len(draws)):
+            for i in range(len(draws)):
     
-        		res[i] = res[i-1] + draws[i]
+                res[i] = res[i-1] + draws[i]
     
-        	return res	
+            return res  
     
         def InverseGaussOU(gamma, a, b, y_0, N, T):
             """docstring for InverseGaussOU"""
@@ -89,19 +89,19 @@ class IGOUSim(MonteCarloBase):
             
             # Sum of normals
             norm_array = [];
-            z_2	= [0.0] * len(POI);
+            z_2 = [0.0] * len(POI);
             for i, n_i in enumerate(POI):
-            	if len(norm_array) != n_i:
-            		normal = (stats.norm.rvs() ** 2) / b
-            		norm_array.append(normal) 
-            	z_2[i] = sum(norm_array)
+                if len(norm_array) != n_i:
+                    normal = (stats.norm.rvs() ** 2) / b
+                    norm_array.append(normal) 
+                z_2[i] = sum(norm_array)
             
             # BDLP for IG-OU
             Z = [sum(a) for a in zip(*(z_1, z_2))]
             
             res = [y_0] * N
             for i in range(len(Z)):
-            	res[i] = -gamma * res[i-1] * dt + Z[i]
+                res[i] = -gamma * res[i-1] * dt + Z[i]
             return res
 
         sim = InverseGaussOU(gamma, a, b, y_0, self.N, self.T)
@@ -116,33 +116,33 @@ class GammaOUSim(MonteCarloBase):
         gamma, a, b, y_0 = self.parameters
         def ProcessGen(draws):
 
-        	res = [0.0] * self.N
+            res = [0.0] * self.N
 
-        	for i in range(len(draws)):
+            for i in range(len(draws)):
 
-        		res[i] = res[i-1] + draws[i]
+                res[i] = res[i-1] + draws[i]
 
-        	return res
-    	def GammaOU(gamma, a, b, y_0, N, T):
-    		"""docstring for GammaOU"""
-    		dt = float(T)/N
-    		PRV = stats.poisson.rvs(a * gamma * dt, size = N)
-    		print PRV
-    		Poisson = ProcessGen(PRV)
-    		POI = [int(i) for i in Poisson]
+            return res
+        def GammaOU(gamma, a, b, y_0, N, T):
+            """docstring for GammaOU"""
+            dt = float(T)/N
+            PRV = stats.poisson.rvs(a * gamma * dt, size = N)
+            print PRV
+            Poisson = ProcessGen(PRV)
+            POI = [int(i) for i in Poisson]
     
-    		norm_array = [];
-    		z	= [0.0] * len(POI);
-    		for i, n_i in enumerate(POI):
-    			if len(norm_array) != n_i:
-    				normal = stats.expon.rvs(b)
-    				norm_array.append(normal) 
-    			z[i] = sum(norm_array)
+            norm_array = [];
+            z   = [0.0] * len(POI);
+            for i, n_i in enumerate(POI):
+                if len(norm_array) != n_i:
+                    normal = stats.expon.rvs(b)
+                    norm_array.append(normal) 
+                z[i] = sum(norm_array)
     
-    		res = [y_0] * N
-    		for i in range(len(z)):
-    			res[i] = -gamma * res[i-1] * dt + z[i]
-    		return res
+            res = [y_0] * N
+            for i in range(len(z)):
+                res[i] = -gamma * res[i-1] * dt + z[i]
+            return res
         sim = GammaOU(gamma, a, b, y_0, self.N, self.T)
         return sim
     
