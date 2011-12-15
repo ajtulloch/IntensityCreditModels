@@ -11,7 +11,10 @@ import CalibrationMaster
 
 #------------------------------------------------------------------------------
 
+cdx_file = "../../Data/CDX.csv"
+
 class CDSTests(unittest.TestCase):
+ 
 	def setUp(self):
 		"""docstring for setUP"""
 		self.HP = CDS.HPCreditDefaultSwap(
@@ -65,7 +68,7 @@ class CDSTests(unittest.TestCase):
 class CalibrationTests(unittest.TestCase):
 	def setUp(self):
 		"""docstring for setUp"""
-		CSV = CreditDerivativeCSVReader.CreditDerivativeCSVReader( file = "../Data/CDX.csv")
+		CSV = CreditDerivativeCSVReader.CreditDerivativeCSVReader( file = cdx_file)
 		date = CSV.Dates()[-1]
 		data = CSV.TimeSlice(date)
 		z = MarketData.MarketData(data)
@@ -112,7 +115,7 @@ class CalibrationMaster(unittest.TestCase):
 					)
 		
 		self.CalibrationMaster = CalibrationMaster.CalibrationMaster( 
-				CreditDerivativeCSVReader.CreditDerivativeCSVReader(file = "../Data/CDX.csv"),
+				CreditDerivativeCSVReader.CreditDerivativeCSVReader(file = cdx_file),
 				HP,
 				)
 				
@@ -140,7 +143,7 @@ class CreditDerivateCSVReaderTests(unittest.TestCase):
 	def setUp(self):
 		"""docstring for setUp"""
 		self.CSVReader = CreditDerivativeCSVReader.CreditDerivativeCSVReader( \
-		 					"../Data/CDX.csv" )
+		 					cdx_file)
 	
 	def tearDown(self):
 		"""docstring for tearDown"""
