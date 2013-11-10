@@ -37,3 +37,7 @@ Graphs are created by running the `GeneratePlots.py` script.
 
 
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ajtulloch/intensitycreditmodels/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
